@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments.html :: head">
+</head>
+<body>
+<header th:replace="fragments.html :: header"></header>
+<div class="alert alert-warning text-center" role="alert" th:if="${account != null && !account?.emailCheck}">
+    가입시 기입한 이메일에 인증링크를 보냈습니다. 인증링크를 통해 회원가입이 정상적으로 완료되며, 그 이전까지는 모든 서비스를 이용하실 수 없습니다.
+</div>
+
+<div th:replace="fragments.html :: footer"></div>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments.html :: head">
+</head>
+<body>
+<header th:replace="fragments.html :: header"></header>
+<div class="container">
+  <div th:replace="fragments.html :: together-info"></div>
+  <div th:replace="fragments.html :: together-menu (member)"></div>
+  <div class="d-flex justify-content-start">
+    <div class="col-auto d-none d-lg-block">
+      <svg th:if="${#strings.isEmpty(post.writer.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+           th:data-jdenticon-value="${post.writer.nickname}" width="128px" height="128px"></svg>
+      <img th:if="${!#strings.isEmpty(post.writer.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+           th:src="${post.writer.profileImage}" width="128px" height="128px"/>
+    </div>
+    <div class="col-4">
+      <a class="mb-0 h1" th:href="@{'/profile/' + ${post.writer.nickname}}" th:text="${post.writer.getNickname()}"></a>
+      <div class="mb-1 text-muted" th:if="${!#strings.isEmpty(post.writer.location)} and ${!#strings.isEmpty(post.writer.job)}" th:text="${post.writer.location}+'에 거주하는 '+${post.writer.getJob()}"></div>
+      <p class="card-text mb-auto" th:text="${post.writer.getIntroduce()}">자기 소개</p>
+    </div>
+  </div>
+  <div class="dropdown-divider"></div>
+  <ul class="list-group">
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <div>
+        <button class="btn btn-primary btn-sm" style="pointer-events: none;" type="button" th:text="${post.postType.krName}" disabled></button>
+      </div>
+      <div class="ms-2 me-auto">
+        <div class="fw-bold fs-5" th:text="${post.title}">
+        </div>
+          <h6 class="calendar" th:text="${post.reportingDate}"></h6>
+        </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start">
+      <div th:utext="${post.content}">
+      </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-between align-items-start" th:each="comment: ${post.comments}">
+          <svg th:if="${#strings.isEmpty(comment.writer.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+               th:data-jdenticon-value="${post.writer.nickname}" width="64px" height="64px"></svg>
+          <img th:if="${!#strings.isEmpty(comment.writer.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+               th:src="${comment.writer.profileImage}" width="64px" height="64px"/>
+      <div class="ms-2 me-auto">
+          <h5 th:text="${comment.writer.nickname}"></h5>
+          <p id="commentContent" class="card-text mb-auto" th:text="${comment.content}"></p>
+          <form id="commentEditForm" class="col" th:action="@{'/together/' + ${together.path} + '/board/' + ${post.id} +'/comment/'+${comment.id} +'/edit'}" th:object="${commentForm}" method="post">
+            <input type="text" th:field="*{content}" class="form-control"/>
+          </form>
+        </div>
+      <div class="ms-2">
+      <span class="calendar" th:text="${comment.reportingDate}"></span>
+      <span class="text-end" th:if="${comment.isMine(#authentication.principal)}">
+        <p>
+          <button id="commentEditCancel" class="btn btn-primary btn-sm" type="button" th:text="${'취소'}"></button>
+          <button id="commentEdit" class="btn btn-primary btn-sm" type="button" th:text="${'수정'}"></button>
+        <a class="btn btn-danger btn-sm"  type="button" th:text="${'삭제'}" data-bs-toggle="modal" data-bs-target="#removeModal"
+           th:data-commentid="${comment.id}" th:data-postid="${post.id}" th:data-type="${'댓글'}"></a>
+        </p>
+      </span>
+      </div>
+    </li>
+    <li class="list-group-item d-flex justify-content-start align-items-start">
+        <svg th:if="${#strings.isEmpty(account.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+             th:data-jdenticon-value="${account.nickname}" width="64px" height="64px"></svg>
+        <img th:if="${!#strings.isEmpty(account.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+             th:src="${account.profileImage}" width="64px" height="64px"/>
+      <form class="col-sm-10 ms-2 mt-3" th:action="@{'/together/' + ${together.path} + '/board/' + ${post.id} +'/comment'}" th:object="${commentForm}" method="post">
+        <input id="content" type="text" th:field="*{content}" class="form-control align-middle">
+      </form>
+    </li>
+  </ul>
+  <div class="d-flex justify-content-end">
+    <a class="btn btn-primary btn-sm" type="button" th:text="${'목록'}" th:href="@{'/together/' + ${together.path} + '/board'}"></a>
+  <span th:if="${post.isMine(#authentication.principal)}">
+        <a class="btn btn-primary btn-sm" type="button" th:text="${'수정'}" th:href="@{'/together/' + ${together.path} + '/board/' +${post.id} + '/edit'}"></a>
+        <a class="btn btn-danger btn-sm"  type="button" th:text="${'삭제'}" data-bs-toggle="modal" data-bs-target="#removeModal" th:data-postid="${post.id}" th:data-type="${'게시글'}"></a>
+      </span>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="removeModal" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+          <form method="post" th:action="@{'/together/' + ${together.path} + '/board/'}" id="removeObject">
+            <button id="removeButton" type="submit" class="btn btn-danger" >삭제하기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div th:replace="fragments.html :: footer"></div>
+<div th:replace="fragments.html :: date-time"></div>
+</div>
+<script type="application/javascript">
+  $("#commentEditForm").hide();
+  $("#commentEditCancel").hide();
+  $(function () {
+    var removeModal = document.getElementById('removeModal')
+    removeModal.addEventListener('show.bs.modal', function (e) {
+      // Button that triggered the modal
+      var button = e.relatedTarget
+      // Extract info from data-bs-* attributes
+      var type = $(e.relatedTarget).data('type')
+      var postid = $(e.relatedTarget).data('postid');
+      var commentid= $(e.relatedTarget).data('commentid');
+
+      var modalTitle = removeModal.querySelector('.modal-title')
+      var modalBodyInput = removeModal.querySelector('.modal-body')
+      var modalFooterButton = removeModal.querySelector('#removeButton')
+      var modalForm = removeModal.querySelector('#removeObject')
+
+      if(commentid != null){
+        modalForm.setAttribute("action",postid + "/comment/" + commentid + "/remove")
+      }else {
+        modalForm.setAttribute("action",postid + "/remove/")
+      }
+
+      modalFooterButton.setAttribute("method","post")
+      modalTitle.textContent = type + ' 삭제 ' + modalForm.getAttribute("action")
+      modalBodyInput.textContent = type + '을 삭제하시겠습니까?'
+
+    })
+
+    $("#commentEdit").click(function() {
+      $("#commentEdit").hide();
+      $("#commentContent").hide();
+      $("#commentEditForm").show();
+      $("#commentEditCancel").show();
+    })
+    $("#commentEditCancel").click(function() {
+      $("#commentEdit").show();
+      $("#commentContent").show();
+      $("#commentEditForm").hide();
+      $("#commentEditCancel").hide();
+    })
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments.html :: head">
+</head>
+<body>
+<header th:replace="fragments.html :: header"></header>
+<div>
+    <div class="d-flex justify-content-center">
+        <div class="col-4">
+            <p class="card-text context">
+            <span th:each="tag: ${account.tags}" class="font-weight-light text-monospace badge bg-pill bg-primary">
+                <<i class="fa fa-tag"></i> <span th:text="${tag.title}">태그</span>
+            </span>
+            <span th:each="zone: ${account.zones}" class="font-weight-light text-monospace badge bg-pill bg-info">
+                <<i class="fa fa-tag"></i> <span th:text="${zone.city}">거주지</span>
+            </span>
+            </p>
+            <h1 class="mb-0" th:text="${account.getNickname()}"></h1>
+            <div class="mb-1 text-muted" th:if="${!#strings.isEmpty(account.location)} and ${!#strings.isEmpty(account.job)}" th:text="${account.location}+'에 거주하는 '+${account.getJob()}"></div>
+            <p class="card-text mb-auto" th:text="${account.getIntroduce()}">자기 소개</p>
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <svg th:if="${#strings.isEmpty(account.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+                 th:data-jdenticon-value="${account.nickname}" width="100%" height="100%"></svg>
+            <img th:if="${!#strings.isEmpty(account.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
+                 th:src="${account.profileImage}" width="100%" height="100%"/>
+            <div class="row" th:if="${isOwner}">
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <a class="btn btn-outline-primary" th:href="@{'/settings/'+ ${#authentication.name}}">프로필 수정</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:replace="fragments.html :: footer"></div>
+</body>
+</html>

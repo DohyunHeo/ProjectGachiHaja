@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments.html :: head">
+</head>
+<body>
+<header th:replace="fragments.html :: header"></header>
+<div class="container">
+    <div th:replace="fragments.html :: together-info"></div>
+    <div th:replace="fragments.html :: together-menu (edit)"></div>
+    <form class="needs-validation" th:action="@{'/together/' + ${together.getPath()} + '/edit'}" th:object="${togetherForm}" method="post" novalidate>
+        <div class="form-group mt-4">
+            <label for="path"><h2>투게더 경로</h2></label>
+            <input id="path" type="text" name="newPath" th:field="*{path}" class="form-control"
+                   placeholder="예) together-path" aria-describedby="pathHelp" required>
+            <small id="pathHelp" class="form-text text-muted">
+                공백없이 문자, 숫자, 대시(-)와 언더바(_)만 3자 이상 20자 이내로 입력하세요. 투게더 홈 주소에 사용합니다. 예) /together/<b>together-path</b>
+            </small>
+            <small class="invalid-feedback">투게더 경로를 입력하세요.</small>
+            <small class="form-text text-danger" th:if="${togetherPathError}" th:text="${togetherPathError}">Path Error</small>
+        </div>
+        <div class="form-group mt-4">
+            <label for="title"><h2>투게더 이름</h2></label>
+            <input id="title" type="text" name="newTitle" th:field="*{title}" class="form-control"
+                   placeholder="투게더 이름" aria-describedby="titleHelp" required maxlength="50">
+            <small id="titleHelp" class="form-text text-muted">
+                투게더 이름을 50자 이내로 입력하세요.
+            </small>
+            <small class="invalid-feedback">투게더 이름을 입력하세요.</small>
+            <small class="form-text text-danger" th:if="${togetherTitleError}" th:text="${togetherTitleError}">Title Error</small>
+        </div>
+        <div class="form-group mt-4">
+            <label for="shortDescription"><h2>짧은 소개</h2></label>
+            <textarea id="shortDescription" type="textarea" th:field="*{shortIntroduce}" class="form-control"
+                      placeholder="투게더를 짧게 소개해 주세요." aria-describedby="shortDescriptionHelp" required maxlength="100">
+                        </textarea>
+            <small id="shortDescriptionHelp" class="form-text text-muted">
+                100자 이내로 투게더를 짧은 소개해 주세요.
+            </small>
+            <small class="invalid-feedback">짧은 소개를 입력하세요.</small>
+            <small class="form-text text-danger" th:if="${#fields.hasErrors('shortIntroduce')}" th:errors="*{shortIntroduce}"></small>
+        </div>
+
+        <div class="form-group mt-4">
+            <label for="longIntroduce"><h2>상세 소개</h2></label>
+            <textarea id="longIntroduce" type="textarea" th:field="*{longIntroduce}" class="form-control"
+                      placeholder="투게더를 자세히 설명해 주세요." aria-describedby="longDescriptionHelp" required></textarea>
+            <small id="longIntroduceHelp" class="form-text text-muted">
+                투게더의 목표, 일정, 진행 방식, 사용할 교재 또는 인터넷 강좌 그리고 모집중인 투게더원 등 투게더에 대해 자세히 적어 주세요.
+            </small>
+            <small class="invalid-feedback">상세 소개를 입력하세요.</small>
+            <small class="form-text text-danger" th:if="${#fields.hasErrors('longIntroduce')}" th:errors="*{longIntroduce}"></small>
+        </div>
+
+        <div class="form-group mt-4">
+            <button class="btn btn-primary btn-block" type="submit"
+                    aria-describedby="submitHelp">수정 완료</button>
+        </div>
+    </form>
+</div>
+<div th:replace="fragments.html :: footer"></div>
+<div th:replace="fragments.html :: editior-script"></div>
+</body>
+</html>

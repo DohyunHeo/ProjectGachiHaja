@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <title>가치하자</title>
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+KR:300,400,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+    <style>
+        a {
+            color:black;
+            text-decoration:none;
+        }
+        .tagify--outside{
+            border: 0;
+        }
+
+        .tagify--outside .tagify__input{
+            order: -1;
+            flex: 100%;
+            border: 1px solid var(--tags-border-color);
+            margin-bottom: 1em;
+            transition: .1s;
+        }
+
+        .tagify--outside .tagify__input:hover{ border-color:var(--tags-hover-border-color); }
+        .tagify--outside.tagify--focus .tagify__input{
+            transition:0s;
+            border-color: var(--tags-focus-border-color);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        body,
+        input,
+        button,
+        select,
+        optgroup,
+        textarea,
+        .tooltip,
+        .popover {
+            font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
+</head>
+<body>
+<header th:fragment="header" class="p-3 bg-dark text-white">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a class="navbar-brand" th:href="@{/}">
+                <img src="/images/main.png" width="50" height="50" >
+            </a>
+
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><h2 class="nav-link px-2 text-white">가치 하자</h2></li>
+                <li><h6 class="nav-link px-2 text-white">Together</h6></li>
+            </ul>
+
+            <form class="col-6 col-lg-auto mb-3 mb-lg-0 me-lg-3" th:action="@{/search/together}" method="get">
+                <input type="search" name="keyword" class="form-control form-control-dark" placeholder="무엇을 같이 해볼까요?" aria-label="Search">
+            </form>
+
+            <div class="text-end">
+                <div sec:authorize="!isAuthenticated()">
+                    <a type="button" class="btn btn-outline-light me-2" th:href="@{/login}">로그인</a>
+                    <a type="button" class="btn btn-primary" th:href="@{/create-account}">회원가입</a>
+                </div>
+                <div sec:authorize="isAuthenticated()">
+                    <a class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                        <span class="navbar-toggler-icon">
+                            <svg th:if="${#strings.isEmpty(account?.profileImage)}" th:data-jdenticon-value="${#authentication.name}" width="32" height="32" class="rounded border bg-light"></svg>
+                            <img th:if="${!#strings.isEmpty(account?.profileImage)}" th:src="${account.getProfileImage()}" width="32" height="32" class="rounded border" >
+                        </span>
+                    </a>
+                    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+                        <div class="offcanvas-header">
+                            <h3 class="offcanvas-title text-black" id="offcanvasNavbarLabel"><span th:text="${#authentication.name}"></span>님 어서오세요!</h3>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                                <li class="nav-item">
+                                    <a class="dropdown-item" th:href="@{'/profile/' + ${#authentication.name}}"><h2>프로필</h2></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" th:href="@{'/settings/profile'}"><h2>설정</h2></a>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                                <li class="nav-item">
+                                    <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
+                                        <button class="dropdown-item" type="submit"><h2>로그아웃</h2></button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div th:fragment="footer" class="container">
+    <footer class="py-3 my-4">
+        <p class="text-center text-muted">© 2021 가치하자 프로젝트</p>
+    </footer>
+</div>
+<div th:fragment="update-tags (baseUrl)">
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script type="application/javascript" th:inline="javascript">
+        $(function () {
+            function tagRequest(url, tagTitle) {
+                $.ajax({
+                    dataType: "json",
+                    autocomplete: {
+                        enabled: true,
+                        rightKey: true,
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    method: "POST",
+                    url: "[(${baseUrl})]" +url,
+                    data: JSON.stringify({'tagTitle': tagTitle})
+                }).done(function (data,status){
+                    console.log("${data} and status is ${status}");
+                });
+            }
+            function onAdd(e){
+                tagRequest("/add", e.detail.data.value);
+            }
+            function onRemove(e){
+                tagRequest("/remove", e.detail.data.value);
+            }
+
+
+            var input = document.querySelector('input[name=tags]');
+            // init Tagify script on the above inputs
+            var tagify = new Tagify(input, {
+                pattern: /^.{0,20}$/,
+                whitelist: JSON.parse(document.querySelector("#tagwhitelist").textContent),
+                dropdown: {
+                    position: "input",
+                    enabled : 0 // always opens dropdown when input gets focus
+                }
+            });
+
+            tagify.on("add", onAdd);
+            tagify.on("remove",onRemove);
+        });
+    </script>
+</div>
+<div th:fragment="update-zones (baseUrl)">
+    <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            function tagRequest(url, zoneCity) {
+                $.ajax({
+                    dataType: "json",
+                    autocomplete: {
+                        enabled: true,
+                        rightKey: true,
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    method: "POST",
+                    url: "[(${baseUrl})]" +url,
+                    data: JSON.stringify({'zoneCity': zoneCity})
+                }).done(function (data,status){
+                    console.log("${data} and status is ${status}");
+                });
+            }
+            function onAdd(e){
+                tagRequest("/add", e.detail.data.value);
+            }
+            function onRemove(e){
+                tagRequest("/remove", e.detail.data.value);
+            }
+
+
+            var input = document.querySelector('input[name=zones]');
+
+            // init Tagify script on the above inputs
+            var tagify = new Tagify(input, {
+                enforceWhitelist: true,
+                whitelist: JSON.parse(document.querySelector("#zonewhitelist").textContent),
+                dropdown: {
+                    position: "input",
+                    enabled : 0 // always opens dropdown when input gets focus
+                }
+            });
+
+            tagify.on("add", onAdd);
+            tagify.on("remove",onRemove);
+        });
+    </script>
+</div>
+<div th:fragment="together-info" class="d-flex flex-row pt-4">
+    <div class="p-2 flex-grow-1 bd-highlight">
+        <a class="text-decoration-none" th:href="@{'/together/' + ${together.path}}">
+            <span class="h1" th:text="${together.title}">스터디 이름</span>
+        </a>
+    </div>
+    <div class="text-right justify-content-end mt-5">
+        <span class="d-inline-block">
+            <button class="btn btn-primary btn-sm" style="pointer-events: none;" type="button" th:text="*{together.togetherType.getKrName}" disabled></button>
+        </span>
+        <span th:if="${!together.published}" class="d-inline-block">
+                    <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled></button>
+        </span>
+        <span th:if="${together.closed}" class="d-inline-block">
+                    <button class="btn btn-primary btn-sm" style="pointer-events: none;" type="button" disabled>종료</button>
+        </span>
+        <span sec:authorize="isAuthenticated()" th:if="${together.isJoinable(#authentication.principal)}"
+              class="btn-group" role="group" aria-label="Basic example">
+                    <a class="btn btn-primary" th:href="@{'/together/' + ${together.path} + '/join'}">
+                        투게더 가입신청
+                    </a>
+        </span>
+        <span sec:authorize="isAuthenticated()" th:if="${together.isCondidate(#authentication.principal)}"
+              class="btn-group" role="group" aria-label="Basic example">
+                    <a class="btn btn-primary">
+                        가입신청 완료
+                    </a>
+        </span>
+        <span sec:authorize="isAuthenticated()"
+              th:if="${!together.closed && together.isMember(#authentication.principal)}" class="btn-group" role="group">
+                    <a class="btn btn-outline-warning" th:href="@{'/together/' + ${together.path} + '/leave'}">
+                        투게더 탈퇴
+                    </a>
+                    <a class="btn btn-outline-primary" th:href="@{'/together/' + ${together.path} + '/members'}"
+                       th:text="${together.members.size()}">1</a>
+        </span>
+    </div>
+</div>
+<div th:fragment="together-menu (togetherMenu)" class="row px-3 justify-content-center fs-5">
+    <nav class="d-flex flex-row nav nav-tabs">
+        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'info'}? active" th:href="@{'/together/' + ${together.path}}">
+            <i class="fa fa-info-circle"></i> 소개
+        </a>
+        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'members'}? active" th:href="@{'/together/' + ${together.path} + '/members'}">
+            <i class="fa fa-user"></i> 구성원
+        </a>
+        <a class="nav-item nav-link"  style="color: dimgray" th:classappend="${togetherMenu == 'board'}? active" th:href="@{'/together/' + ${together.path} + '/board'}">
+            <i class="fa fa-clipboard"></i> 게시판
+        </a>
+        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'events'}? active" th:href="@{'/together/' + ${together.path} + '/events'}">
+            <i class="fa fa-calendar"></i> 모임
+        </a>
+        <a sec:authorize="isAuthenticated()" style="color: dimgray" th:if="${together.isManager(#authentication.principal)}"
+           class="nav-item nav-link" th:classappend="${togetherMenu == 'settings'}? active" th:href="@{'/together/' + ${together.path} + '/settings/'}">
+            <i class="fa fa-cog"></i> 설정
+        </a>
+        <a sec:authorize="isAuthenticated()" style="color: dimgray" th:if="${together.isManager(#authentication.principal)}"
+           class="nav-item nav-link" th:classappend="${togetherMenu == 'edit'}? active"  th:href="@{'/together/' + ${together.path} + '/edit/'}">
+            <i class="fa fa-edit"></i> 정보수정
+        </a>
+        <a sec:authorize="isAuthenticated()" style="color: dimgray" th:if="${together.isManager(#authentication.principal)}"
+           class="nav-item nav-link" th:classappend="${togetherMenu == 'entryform'}? active" href="#" th:href="@{'/together/' + ${together.path} + '/entryform/'}">
+            <i class="fa fa-list-alt"></i> 참가신청현황
+            <button class="btn btn-info btn-sm" style="pointer-events: none;" type="button" th:text="${together.candidates.size()}" disabled></button>
+        </a>
+    </nav>
+</div>
+<div th:fragment="editior-script">
+    <script type="application/javascript">
+        $(document).ready(function() {
+            $('#longIntroduce').summernote();
+        });
+    </script>
+</div>
+<div th:fragment="date-time">
+    <script src="/node_modules/moment/min/moment-with-locales.min.js"></script>
+    <script type="application/javascript">
+        $(function () {
+            moment.locale('ko');
+            $(".date-time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLL');
+            });
+            $(".date").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LL');
+            });
+            $(".weekday").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('dddd');
+            });
+            $(".time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LT');
+            });
+            $(".calendar").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").calendar();
+            });
+            $(".fromNow").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").fromNow();
+            });
+            $(".date-weekday-time").text(function(index, dateTime) {
+                return moment(dateTime, "YYYY-MM-DD`T`hh:mm").format('LLLL');
+            });
+        })
+    </script>
+</div>
+<script type="application/javascript" th:fragment="form-validation">
+    (function (){
+        'use strict';
+        window.addEventListener('load', function ()
+        {
+            const forms = document.getElementsByClassName('needs-validation');
+
+            Array.prototype.filter.call(forms, function (form){
+                form.addEventListener('submit',function (event){
+                    if (form.checkValidity() === false){
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        },false)
+    }())
+</script>
+</body>
+</html>

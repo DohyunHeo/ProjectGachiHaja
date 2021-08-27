@@ -30,7 +30,7 @@ public class TogetherRepositoryAdvencedImpl extends QuerydslRepositorySupport im
                 .leftJoin(together.members, QAccount.account).fetchJoin()
                 .distinct();
         JPQLQuery<Together> pageableQuery = getQuerydsl().applyPagination(pageable, query);
-        QueryResults<Together> studyQueryResults = pageableQuery.fetchResults();
-        return new PageImpl<>(studyQueryResults.getResults(), pageable, studyQueryResults.getTotal());
+        QueryResults<Together> togetherQueryResults = pageableQuery.fetchResults();
+        return new PageImpl<>(togetherQueryResults.getResults(), pageable, togetherQueryResults.getTotal());
     }
 }

@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Transactional(readOnly = true)
 public interface TogetherRepository extends JpaRepository<Together, Long>, TogetherRepositoryAdvenced {
 
@@ -15,4 +17,7 @@ public interface TogetherRepository extends JpaRepository<Together, Long>, Toget
 
     @EntityGraph(value = "Together.withPostAndAccount")
     Together findWithPostsByPath(String path);
+
+    @EntityGraph(attributePaths = {"members","managers","tags","zones"})
+    List<Together> findFirst8ByPublishedAndClosedOrderByPublishedDateTimeDesc(boolean b, boolean b1);
 }

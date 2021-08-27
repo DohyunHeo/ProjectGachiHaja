@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
+
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
@@ -23,6 +25,8 @@ public class HomeController {
         if (account != null){
             model.addAttribute(account);
         }
+        List<Together> togetherList = togetherRepository.findFirst8ByPublishedAndClosedOrderByPublishedDateTimeDesc(true, false);
+        model.addAttribute("togetherPage", togetherList);
         return "index";
     }
 
@@ -37,7 +41,7 @@ public class HomeController {
         Page<Together> togetherPage = togetherRepository.findByKeyword(keyword, pageable);
         model.addAttribute("togetherPage", togetherPage);
         model.addAttribute("keyword",keyword);
-        model.addAttribute("sortProperty", pageable.getSort().toString().contains("publishedDateTime") ? "publishedDateTime" : "memberCount");
+        model.addAttribute("sortProperty", pageable.getSort().toString().contains("publishedDateTime"));
         return "search";
     }
 }

@@ -24,4 +24,5 @@
 * Together 모임 일정 표시
 * 각종 알림
 * index 페이지
+* 처리 가능한 모든 곳에 validator 적용
 * REST API + OAuth 2.0 적용

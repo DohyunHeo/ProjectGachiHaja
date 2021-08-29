@@ -36,6 +36,19 @@ public class TogetherBoardController {
     private final CommentService commentService;
     private final CommentRepository commentRepository;
 
+    @GetMapping("/together/{path}/board")
+    public String togetherBoardView(@CurrentAccount Account account, @PathVariable String path,
+                                    @PageableDefault(size = 9,sort="reportingDate", direction = Sort.Direction.DESC) Pageable pageable, Model model){
+        Together together = togetherRepository.findWithPostsByPath(path);
+        Page<Post> postPage = postRepository.findWithAllPage(pageable);
+
+        model.addAttribute(together);
+        model.addAttribute("postPage",postPage);
+        model.addAttribute("sortProperty", pageable.getSort().toString().contains("reportingDate") ? "reportingDate" : "memberCount");
+
+        return "together/board/board";
+    }
+
     @GetMapping("/together/{path}/board/create")
     public String togetherPostCreate(@CurrentAccount Account account, @PathVariable String path, Model model){
         Together together = togetherRepository.findWithPostsByPath(path);

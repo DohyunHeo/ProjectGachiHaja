@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments.html :: head">
+</head>
+<body>
+<header th:replace="fragments.html :: header"></header>
+<div class="container">
+    <div th:replace="fragments.html :: together-info"></div>
+    <div th:replace="fragments.html :: together-menu (schedule)"></div>
+    <div id='calendar' style="background-color: white"></div>
+</div>
+<div name="scheduleList" th:each="schedule: ${together.schedules}" th:text="${schedule.title + '/' +schedule.getStart + '/' +schedule.getEnd+ '/'+schedule.id}"></div>
+<div th:replace="fragments.html :: footer"></div>
+<script th:replace="fragments.html :: csrf"></script>
+<script src="/node_modules/moment/moment.js"></script>
+<script type="application/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var url = document.location.href;
+        var scheduleList = document.getElementsByName("scheduleList")
+        var schedule = []
+        scheduleList.forEach(function (schedules,index, array) {
+            var split = schedules.innerText.split('/')
+            var data = {};
+            data.title = split[0]
+            data.start = split[1]
+            data.end = split[2]
+            schedule.push(data)
+        })
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'ko',
+            allDaySlot: false,
+            eventLimit: true,
+            contentHeight: 'auto',
+            eventSources: [{
+                events: function(info, successCallback, failureCallback) {
+                    $.ajax({
+                        url: url+'/load',
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(data) {
+                            successCallback(data);
+                        }
+                    });
+                }
+            }]
+            , eventClick:function(info) {
+                var base_url = window.location.pathname + "/" + info.event.id
+                location.replace(base_url);
+            }
+        });
+        calendar.render();
+        calendar.on('dateClick', function(info) {
+            if(moment().isBefore(info.dateStr)) {
+                var base_url = window.location.pathname + "/create?startDate=" +info.dateStr
+                location.replace(base_url);
+            }
+        });
+    });
+
+</script>
+</body>
+</html>
+

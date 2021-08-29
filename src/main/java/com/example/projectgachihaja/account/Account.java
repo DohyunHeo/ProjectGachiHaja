@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
-@Builder @AllArgsConstructor
+@AllArgsConstructor
 @NoArgsConstructor
 public class Account {
     @Id @GeneratedValue

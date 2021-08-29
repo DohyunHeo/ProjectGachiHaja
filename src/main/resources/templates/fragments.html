@@ -9,11 +9,16 @@
     <link rel="stylesheet" href="/node_modules/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css"/>
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/node_modules/fullcalendar/main.min.css"/>
+    <script src="/node_modules/fullcalendar/main.min.js"></script>
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
     <style>
+        body{
+            background-color: whitesmoke;
+        }
         a {
             color:black;
             text-decoration:none;
@@ -96,7 +101,7 @@
             <div class="text-end">
                 <div sec:authorize="!isAuthenticated()">
                     <a type="button" class="btn btn-outline-light me-2" th:href="@{/login}">로그인</a>
-                    <a type="button" class="btn btn-primary" th:href="@{/create-account}">회원가입</a>
+                    <a type="button" class="btn btn-light" th:href="@{/create-account}">회원가입</a>
                 </div>
                 <div sec:authorize="isAuthenticated()">
                     <a class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
@@ -137,6 +142,15 @@
         <p class="text-center text-muted">© 2021 가치하자 프로젝트</p>
     </footer>
 </div>
+<script type="application/javascript" th:inline="javascript" th:fragment="csrf">
+    $(function () {
+        var csrfToken = /*[[${_csrf.token}]]*/ null;
+        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+        $(document).ajaxSend(function (e, xhr, options){
+            xhr.setRequestHeader(csrfHeader,csrfToken);
+        });
+    });
+</script>
 <div th:fragment="update-tags (baseUrl)">
     <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
     <script type="application/javascript" th:inline="javascript">
@@ -273,7 +287,7 @@
         <a class="nav-item nav-link"  style="color: dimgray" th:classappend="${togetherMenu == 'board'}? active" th:href="@{'/together/' + ${together.path} + '/board'}">
             <i class="fa fa-clipboard"></i> 게시판
         </a>
-        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'events'}? active" th:href="@{'/together/' + ${together.path} + '/events'}">
+        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'events'}? active" th:href="@{'/together/' + ${together.path} + '/schedule'}">
             <i class="fa fa-calendar"></i> 일정
         </a>
         <a sec:authorize="isAuthenticated()" style="color: dimgray" th:if="${together.isManager(#authentication.principal)}"

@@ -73,15 +73,7 @@
 </div>
 <div
 <div th:replace="fragments.html :: footer"></div>
-<script type="application/javascript" th:inline="javascript" >
-    $(function () {
-        var csrfToken = /*[[${_csrf.token}]]*/ null;
-        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
-        $(document).ajaxSend(function (e, xhr, options){
-            xhr.setRequestHeader(csrfHeader,csrfToken);
-        });
-    });
-</script>
+<script th:replace="fragments.html :: csrf"></script>
 <div th:replace="fragments.html :: update-tags (baseUrl='/together/'+${together.getPath()} + '/settings')"></div>
 <div th:replace="fragments.html :: update-zones (baseUrl='/together/'+${together.getPath()} + '/settings')"></div>
 </body>

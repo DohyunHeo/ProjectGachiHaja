@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Entity
 @Getter @Setter
-@EqualsAndHashCode(of = "id") @Builder
+@EqualsAndHashCode(of = "id")
 @AllArgsConstructor @NoArgsConstructor
 @SequenceGenerator(
         name = "POST_SEQ_GENERATOR",

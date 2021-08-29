@@ -3,6 +3,7 @@ package com.example.projectgachihaja.Together;
 import com.example.projectgachihaja.Post.Post;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
+import com.example.projectgachihaja.schedule.Schedule;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.RequiredArgsConstructor;
@@ -106,15 +107,4 @@ public class TogetherService {
         together.getPosts().remove(post);
     }
 
-    public void manymanyCreate(Account account) {
-        for(int i= 1 ; i <=30 ; i++){
-            Together together = new Together();
-            together.getManagers().add(account);
-            together.setPath("Test"+i);
-            together.setTitle("많을 수록 좋은 테스트 " +i);
-            together.setLongIntroduce("많아많아");
-            together.setShortIntroduce("많아요");
-            togetherRepository.save(together);
-        }
-    }
 }

@@ -209,6 +209,7 @@
     });
   });
 </script>
+<script th:replace="fragments.html :: csrf"></script>
 <div th:replace="fragments.html :: update-tags (baseUrl='/settings/'+${account.getNickname()})"></div>
 <div th:replace="fragments.html :: update-zones (baseUrl='/settings/'+${account.getNickname()})"></div>
 </body>

@@ -1,9 +1,8 @@
 package com.example.projectgachihaja.Together;
-
-
 import com.example.projectgachihaja.Post.Post;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.UserAccount;
+import com.example.projectgachihaja.schedule.Schedule;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.*;
@@ -29,7 +28,7 @@ import java.util.Set;
 )
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
-@Builder @AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 public class Together {
     @Id @GeneratedValue
     private Long id;
@@ -45,6 +44,9 @@ public class Together {
 
     @OneToMany
     private Set<Post> posts = new HashSet<>();
+
+    @OneToMany
+    private Set<Schedule> schedules = new HashSet<>();
 
     public int candidates_count;
 

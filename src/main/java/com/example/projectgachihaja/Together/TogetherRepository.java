@@ -12,6 +12,9 @@ public interface TogetherRepository extends JpaRepository<Together, Long>, Toget
     @EntityGraph(attributePaths = {"members","managers","tags","zones"})
     Together findByPath(String path);
 
+    @EntityGraph(attributePaths = {"schedules","members","managers"})
+    Together findWithSchedulesByPath(String path);
+
     @EntityGraph(attributePaths = {"candidates"})
     Together findTogetherWithCandidatesByPath(String path);
 

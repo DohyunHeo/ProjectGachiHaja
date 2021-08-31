@@ -11,7 +11,7 @@
         <h2>로그인</h2>
     </div>
     <div class="row justify-content-center">
-        <div th:if="${param.error}" class="alert alert-danger" role="alert">
+        <div th:if="${param.error}" class="alert alert-danger text-center col-sm-6 d-grid" role="alert">
             <p>이메일이나 닉네임, 비밀번호를 확인해주세요.</p>
         </div>
     </div>
@@ -45,7 +45,7 @@
                         aria-describedby="submitHelp">로그인</button>
                 <p>
                     <small id="submitHelp" class="form-text text-muted">
-                        계정이 없으시다면 <a th:href="@{/sign-up}">회원가입</a> 하시기 바랍니다.
+                        계정이 없으시다면 <a th:href="@{/create-account}">회원가입</a> 하시기 바랍니다.
                     </small>
                 </p>
             </div>

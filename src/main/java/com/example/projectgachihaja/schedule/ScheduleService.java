@@ -4,6 +4,7 @@ import com.example.projectgachihaja.Together.Together;
 import com.example.projectgachihaja.account.Account;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ScheduleService {
     private final ModelMapper modelMapper;
     private final ScheduleRepository scheduleRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Schedule createNewSchedule(ScheduleForm scheduleForm, Account account) {
         Schedule schedule = modelMapper.map(scheduleForm, Schedule.class);
@@ -31,5 +33,17 @@ public class ScheduleService {
     public void scheduleRegistrationApproval(Account candidate, Schedule schedule) {
         schedule.getCandidates().remove(candidate);
         schedule.getMembers().add(candidate);
+        eventPublisher.publishEvent(new ScheduleParticipationEvent(schedule, candidate));
+    }
+
+    public void editSchedule(Schedule schedule, ScheduleForm scheduleForm) {
+        schedule.setIntroduce(scheduleForm.getIntroduce());
+        schedule.setStart(scheduleForm.getStart());
+        schedule.setEnd(scheduleForm.getEnd());
+        schedule.setTitle(scheduleForm.getTitle());
+    }
+
+    public void removeSchedule(Schedule schedule) {
+        scheduleRepository.delete(schedule);
     }
 }

@@ -9,6 +9,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -118,5 +120,9 @@ public class Together {
         } else {
             throw new RuntimeException("투게더를 종료할 수 없는 상태입니다. 투개더를 공개하지 않았거나 이미 종료 되었습니다.");
         }
+    }
+
+    public String pathEncoder(){
+        return URLEncoder.encode(path, StandardCharsets.UTF_8);
     }
 }

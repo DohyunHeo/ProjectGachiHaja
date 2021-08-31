@@ -22,16 +22,24 @@
                     <div class="card mb-4 shadow-sm">
                         <img th:src="${together.banner}" class="context card-img-top" th:alt="${together.banner}">
                         <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
                             <a th:href="@{'/together/' + ${together.path}}" class="text-decoration-none">
                                 <h5 class="card-text context" th:text="${together.title}"></h5>
                             </a>
+                            <span class="d-inline-block">
+                                 <button class="btn btn-outline-dark btn-sm" th:text="${together.togetherType.krName}" style="pointer-events: none;" type="button" disabled></button>
+                             </span>
+                            </div>
                             <p class="card-text" th:text="${together.shortIntroduce}">짧은 소개</p>
                             <p class="card-text context">
+                                <span th:if="${together.tags.size() == 0} and ${together.zones.size() == 0}" class="d-inline-block">
+                                   <button class="btn btn-outline-dark btn-sm" th:text="${'주제없음'}" style="pointer-events: none;" type="button" disabled></button>
+                                </span>
                                     <span th:each="tag: ${together.tags}" class="d-inline-block">
-                                        <button class="btn btn-primary btn-sm" th:text="${tag.title}" style="pointer-events: none;" type="button" disabled></button>
+                                        <button class="btn btn-outline-dark btn-sm" th:text="${tag.title}" style="pointer-events: none;" type="button" disabled></button>
                                     </span>
                                 <span th:each="zone: ${together.zones}" class="d-inline-block">
-                                     <button class="btn btn-primary btn-sm" th:text="${zone.city}" style="pointer-events: none;" type="button" disabled></button>
+                                     <button class="btn btn-outline-dark btn-sm" th:text="${zone.city}" style="pointer-events: none;" type="button" disabled></button>
                                 </span>
                             </p>
                             <div class="d-flex justify-content-between align-items-center">

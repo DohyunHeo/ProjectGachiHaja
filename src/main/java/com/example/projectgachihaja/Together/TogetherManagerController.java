@@ -150,10 +150,10 @@ public class TogetherManagerController {
     }
 
     @PostMapping("/together/{path}/entryform")
-    public String togetherCandidates(@CurrentAccount Account account,@PathVariable String path, String nickname, RedirectAttributes flashmessage){
+    public String togetherCandidates(@CurrentAccount Account account,@PathVariable String path, String nickname,Boolean request, RedirectAttributes flashmessage){
         Account candidate = accountRepository.findByNickname(nickname);
         Together together = togetherRepository.findByPath(path);
-        togetherService.togetherRegistrationApproval(together,candidate);
+        togetherService.togetherRegistrationApproval(together,candidate,request);
         flashmessage.addFlashAttribute("message","변경 완료");
 
         return "redirect:/together/"+together.getPath()+"/entryform";

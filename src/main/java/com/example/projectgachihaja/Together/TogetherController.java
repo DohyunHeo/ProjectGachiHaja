@@ -71,4 +71,11 @@ public class TogetherController {
         togetherService.addTogetherCandidates(account, together);
         return "redirect:/together/"+together.getPath();
     }
+
+    @GetMapping("/together/{path}/leave")
+    public String togetherLeave(@CurrentAccount Account account, @PathVariable String path){
+        Together together = togetherRepository.findByPath(path);
+        togetherService.togetherLeave(account, together);
+        return "redirect:/together/"+together.getPath();
+    }
 }

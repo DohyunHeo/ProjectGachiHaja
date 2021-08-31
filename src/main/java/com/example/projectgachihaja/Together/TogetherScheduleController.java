@@ -59,6 +59,7 @@ public class TogetherScheduleController {
     public String togetherScheduleCreateComplete(@CurrentAccount Account account, @PathVariable String path, ScheduleForm scheduleForm) {
         Together together = togetherRepository.findWithSchedulesByPath(path);
         Schedule newSchedule = scheduleService.createNewSchedule(scheduleForm, account);
+        togetherService.addSchedule(together,newSchedule);
 
         return "redirect:/together/"+path+"/schedule";
     }
@@ -91,7 +92,36 @@ public class TogetherScheduleController {
         Account candidate = accountRepository.findByNickname(nickname);
         scheduleService.scheduleRegistrationApproval(candidate, schedule);
 
+
         return "redirect:/together/"+path+"/schedule/"+id;
+    }
+
+    @GetMapping("/together/{path}/schedule/{id}/edit")
+    public String togetherScheduleEdit(@CurrentAccount Account account, @PathVariable String path,@PathVariable Long id, Model model){
+        Together together = togetherRepository.findWithSchedulesByPath(path);
+        Schedule schedule = scheduleRepository.findWithMembersById(id);
+        ScheduleForm scheduleForm = modelMapper.map(schedule, ScheduleForm.class);
+        model.addAttribute(scheduleForm);
+        model.addAttribute(together);
+        model.addAttribute(account);
+        return "/together/schedule/edit";
+    }
+
+    @PostMapping("/together/{path}/schedule/{id}/edit")
+    public String togetherScheduleEditComplete(@CurrentAccount Account account, @PathVariable String path,@PathVariable Long id, ScheduleForm scheduleForm){
+        Together together = togetherRepository.findWithSchedulesByPath(path);
+        Schedule schedule = scheduleRepository.findWithMembersById(id);
+        scheduleService.editSchedule(schedule, scheduleForm);
+        return "redirect:/together/"+path+"/schedule/"+id;
+    }
+
+    @PostMapping("/together/{path}/schedule/{id}/remove")
+    public String togetherScheduleRemove(@CurrentAccount Account account, @PathVariable String path,@PathVariable Long id){
+        Together together = togetherRepository.findWithSchedulesByPath(path);
+        Schedule schedule = scheduleRepository.findWithMembersById(id);
+        togetherService.removeSchedule(schedule,together);
+        scheduleService.removeSchedule(schedule);
+        return "redirect:/together/"+path+"/schedule";
     }
 
 

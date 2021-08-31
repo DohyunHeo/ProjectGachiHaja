@@ -9,8 +9,8 @@
     가입시 기입한 이메일에 인증링크를 보냈습니다. 인증링크를 통해 회원가입이 정상적으로 완료되며, 그 이전까지는 모든 서비스를 이용하실 수 없습니다.
 </div>
 <div class="container" sec:authorize="!isAuthenticated()">
-    <div class="tracking position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center">
-        <div class="col-md-12 p-lg-5 mx-auto my-5">
+    <div class="tracking position-relative overflow-hidden p-md-5 m-md-3 text-center">
+        <div class="col-md-12 mx-auto my-5">
             <h1 class="display-3 fw-normal">같이하면 더 가치있다</h1>
             <p class="lead fw-normal">모임 웹 서비스 가치하자</p>
             <a class="btn btn-outline-secondary">회원가입</a>
@@ -39,13 +39,13 @@
                             <h5 class="card-text context" th:text="${together.title}"></h5>
                         </a>
                              <span class="d-inline-block">
-                                        <button class="btn btn-outline-dark btn-sm" th:text="${together.togetherType.krName}" style="pointer-events: none;" type="button" disabled></button>
+                                 <button class="btn btn-outline-dark btn-sm" th:text="${together.togetherType.krName}" style="pointer-events: none;" type="button" disabled></button>
                              </span>
                          </div>
                         <p class="card-text" th:text="${together.shortIntroduce}">짧은 소개</p>
                         <p class="card-text context">
                             <span th:if="${together.tags.size() == 0} and ${together.zones.size() == 0}" class="d-inline-block">
-                                        <button class="btn btn-outline-dark btn-sm" th:text="${'주제없음'}" style="pointer-events: none;" type="button" disabled></button>
+                                <button class="btn btn-outline-dark btn-sm" th:text="${'주제없음'}" style="pointer-events: none;" type="button" disabled></button>
                             </span>
                                     <span th:each="tag: ${together.tags}" class="d-inline-block">
                                         <button class="btn btn-outline-dark btn-sm" th:text="${tag.title}" style="pointer-events: none;" type="button" disabled></button>

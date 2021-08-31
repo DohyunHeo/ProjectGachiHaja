@@ -115,15 +115,6 @@
   </div>
 </div>
 <div th:replace="fragments.html :: footer"></div>
-<script type="application/javascript" th:inline="javascript" >
-  $(function () {
-    var csrfToken = /*[[${_csrf.token}]]*/ null;
-    var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
-    $(document).ajaxSend(function (e, xhr, options){
-      xhr.setRequestHeader(csrfHeader,csrfToken);
-    });
-  });
-</script>
 <link href="/node_modules/cropper/dist/cropper.min.css" rel="stylesheet">
 <script src="/node_modules/cropper/dist/cropper.min.js"></script>
 <script src="/node_modules/jquery-cropper/dist/jquery-cropper.min.js"></script>
@@ -209,7 +200,6 @@
     });
   });
 </script>
-<script th:replace="fragments.html :: csrf"></script>
 <div th:replace="fragments.html :: update-tags (baseUrl='/settings/'+${account.getNickname()})"></div>
 <div th:replace="fragments.html :: update-zones (baseUrl='/settings/'+${account.getNickname()})"></div>
 </body>

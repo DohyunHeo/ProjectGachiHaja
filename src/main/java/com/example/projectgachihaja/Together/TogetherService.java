@@ -1,16 +1,22 @@
 package com.example.projectgachihaja.Together;
 
 import com.example.projectgachihaja.Post.Post;
+import com.example.projectgachihaja.Post.PostType;
+import com.example.projectgachihaja.Together.event.TogetherCreateEvent;
+import com.example.projectgachihaja.Together.event.TogetherJoinEvent;
+import com.example.projectgachihaja.Together.event.TogetherUpdateEvent;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.schedule.Schedule;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,6 +25,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TogetherService {
     private final TogetherRepository togetherRepository;
+    private final ApplicationEventPublisher eventPublisher;
     public Together createNewTogether(Together together, Account account) {
         together.getManagers().add(account);
         Together newTogether = togetherRepository.save(together);
@@ -64,11 +71,11 @@ public class TogetherService {
     }
 
     public Together managerCheck(Account account, String path) {
-        Together byPath = togetherRepository.findByPath(path);
-        if(!byPath.getManagers().contains(account)){
+        Together together = togetherRepository.findByPath(path);
+        if(!together.getManagers().contains(account)){
             throw new AccessDeniedException("해당 기능을 사용할 권한이 없습니다.");
         }
-        return byPath;
+        return together;
     }
 
     public void bannerSetting(Together together, boolean b) {
@@ -77,6 +84,7 @@ public class TogetherService {
 
     public void togetherPublish(Together together) {
         together.published();
+        eventPublisher.publishEvent(new TogetherCreateEvent(together));
     }
 
     public void togetherClose(Together together) {
@@ -88,23 +96,50 @@ public class TogetherService {
         together.candidates_count++;
     }
 
-    public void togetherRegistrationApproval(Together together, Account candidate) {
-        if(together.getCandidates().contains(candidate)){
+    public void togetherRegistrationApproval(Together together, Account candidate, Boolean request) {
+        if(together.getCandidates().contains(candidate) && request){
             together.getCandidates().remove(candidate);
             together.getMembers().add(candidate);
             together.candidates_count--;
+            eventPublisher.publishEvent(new TogetherJoinEvent(together,candidate,"가입이 승인되었습니다."));
         }
-        else{
-            throw new AccessDeniedException("해당 기능을 사용할 권한이 없습니다.");
+        else if (together.getCandidates().contains(candidate) && !request){
+            together.getCandidates().remove(candidate);
+            together.candidates_count--;
+            eventPublisher.publishEvent(new TogetherJoinEvent(together,candidate,"가입이 거부되었습니다."));
         }
     }
 
     public void newPostRegister(Together together, Post newPost) {
         together.getPosts().add(newPost);
+        if (newPost.getPostType() == PostType.NOTICE){
+            eventPublisher.publishEvent(new TogetherUpdateEvent(together,"새 공지가 게시되었습니다."));
+        }
     }
 
     public void postDelete(Together together, Post post) {
         together.getPosts().remove(post);
     }
 
+    public void addSchedule(Together together, Schedule newSchedule) {
+        together.getSchedules().add(newSchedule);
+        eventPublisher.publishEvent(new TogetherUpdateEvent(together,"일정이 추가되었습니다."));
+    }
+
+    public void removeSchedule(Schedule schedule, Together together) {
+        together.getSchedules().remove(schedule);
+        eventPublisher.publishEvent(new TogetherUpdateEvent(together,"일정이 취소되었습니다."));
+    }
+
+    public List<Together> togetherList(Account account) {
+        return togetherRepository.findByMembers(account);
+    }
+
+    public void togetherLeave(Account account, Together together) {
+        together.getMembers().remove(account);
+    }
+
+    public List<Together> createTogetherList(Account account) {
+        return togetherRepository.findByManagers(account);
+    }
 }

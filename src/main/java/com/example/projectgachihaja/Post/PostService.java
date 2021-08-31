@@ -1,16 +1,15 @@
 package com.example.projectgachihaja.Post;
 
 import com.example.projectgachihaja.Together.Together;
-import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.comment.Comment;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -19,6 +18,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final ModelMapper modelMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Post createNewPost(PostForm postForm, Account writer) {
         Post post = modelMapper.map(postForm, Post.class);
@@ -27,9 +27,12 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public void newCommentRegister(Post post, Comment newComment) {
+    public void newCommentRegister(Together together, Post post, Comment newComment) {
         post.getComments().add(newComment);
         postRepository.save(post);
+
+        if(!post.getWriter().getNickname().equals(newComment.getWriter().getNickname()))
+        eventPublisher.publishEvent(new CommentNoticeToPostWriterEvent(post.getWriter(),together,post));
     }
 
     public void updateViewer(Post post, Account account) {

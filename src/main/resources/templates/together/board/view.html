@@ -37,7 +37,7 @@
       <div th:utext="${post.content}">
       </div>
     </li>
-    <li class="list-group-item d-flex justify-content-between align-items-start" th:each="comment: ${post.comments}">
+    <li class="list-group-item d-flex justify-content-between align-items-start" th:each="comment: ${#lists.sort(post.comments, commentForm.commentComparator)}">
       <svg th:if="${#strings.isEmpty(comment.writer.profileImage)}" class="img-fluid float-left rounded img-thumbnail"
            th:data-jdenticon-value="${post.writer.nickname}" width="64px" height="64px"></svg>
       <img th:if="${!#strings.isEmpty(comment.writer.profileImage)}" class="img-fluid float-left rounded img-thumbnail"

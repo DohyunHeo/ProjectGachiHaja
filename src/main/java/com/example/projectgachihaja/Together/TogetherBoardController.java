@@ -43,6 +43,7 @@ public class TogetherBoardController {
         Page<Post> postPage = postRepository.findWithAllPage(pageable);
 
         model.addAttribute(together);
+        model.addAttribute(account);
         model.addAttribute("postPage",postPage);
         model.addAttribute("sortProperty", pageable.getSort().toString().contains("reportingDate") ? "reportingDate" : "memberCount");
 
@@ -143,7 +144,7 @@ public class TogetherBoardController {
         Together together = togetherRepository.findWithPostsByPath(path);
         Post post = postRepository.findWithCommentsById(postid);
         Comment newComment = commentService.newCommentWrite(account, commentForm);
-        postService.newCommentRegister(post,newComment);
+        postService.newCommentRegister(together,post,newComment);
 
         return "redirect:/together/" +together.getPath() + "/board/" + post.getId();
     }

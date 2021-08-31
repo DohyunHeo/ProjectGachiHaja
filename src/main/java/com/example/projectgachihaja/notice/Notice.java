@@ -1,7 +1,6 @@
-package com.example.projectgachihaja.comment;
+package com.example.projectgachihaja.notice;
 
 import com.example.projectgachihaja.account.Account;
-import com.example.projectgachihaja.account.UserAccount;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -9,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 
 @Entity
 @Getter
@@ -17,19 +15,20 @@ import java.util.Comparator;
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Notice {
     @Id @GeneratedValue
     Long id;
 
     @ManyToOne
-    Account writer;
+    Account account;
 
-    String content;
+    String title;
 
-    LocalDateTime reportingDate;
+    String message;
 
-    public boolean isMine(UserAccount userAccount) {
-        return this.writer.equals(userAccount.getAccount());
-    }
+    String link;
 
+    boolean checked;
+
+    LocalDateTime createdTime;
 }

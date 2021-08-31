@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/node_modules/@yaireo/tagify/dist/tagify.css"/>
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/node_modules/fullcalendar/main.min.css"/>
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
     <script src="/node_modules/fullcalendar/main.min.js"></script>
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/node_modules/jdenticon/dist/jdenticon.min.js"></script>
@@ -104,7 +105,7 @@
                     <a type="button" class="btn btn-light" th:href="@{/create-account}">회원가입</a>
                 </div>
                 <div sec:authorize="isAuthenticated()">
-                    <a class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                    <a id="accountmenu" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
                         <span class="navbar-toggler-icon">
                             <svg th:if="${#strings.isEmpty(account?.profileImage)}" th:data-jdenticon-value="${#authentication.name}" width="32" height="32" class="rounded border bg-light"></svg>
                             <img th:if="${!#strings.isEmpty(account?.profileImage)}" th:src="${account.getProfileImage()}" width="32" height="32" class="rounded border" >
@@ -123,11 +124,49 @@
                                 <li class="nav-item">
                                     <a class="dropdown-item" th:href="@{'/settings/profile'}"><h2>설정</h2></a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" th:href="@{'/together/create'}"><h2>투게더 만들기</h2></a>
+                                </li>
                                 <div class="dropdown-divider"></div>
                                 <li class="nav-item">
                                     <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
                                         <button class="dropdown-item" type="submit"><h2>로그아웃</h2></button>
                                     </form>
+                                </li>
+                                <div class="dropdown-divider"></div>
+                            </ul>
+                            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                                <li class="nav-item">
+                                    <div class="accordion" id="createTogetherAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="createTogetherListAccordion">
+                                                <button id="createTogetherAccordionButton" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#createTogetherCollapse" aria-expanded="true" aria-controls="createTogetherCollapse">
+                                                    <h3>만든 투게더 목록</h3>
+                                                </button>
+                                            </h2>
+                                            <div id="createTogetherCollapse" class="accordion-collapse collapse" aria-labelledby="createTogetherListAccordion" data-bs-parent="#createTogetherAccordion">
+                                                <div class="accordion-body" id="createTogetherList">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                                <li class="nav-item">
+                                    <div class="accordion" id="togetherAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="TogetherListAccordion">
+                                                <button id="togetherAccordionButton" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#togetherCollapse" aria-expanded="true" aria-controls="togetherCollapse">
+                                                    <h3>가입한 투게더 목록</h3>
+                                                </button>
+                                            </h2>
+                                            <div id="togetherCollapse" class="accordion-collapse collapse" aria-labelledby="togetherListAccordion" data-bs-parent="#togetherAccordion">
+                                                <div class="accordion-body" id="togetherList">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -136,21 +175,69 @@
             </div>
         </div>
     </div>
+    <script type="application/javascript" th:inline="javascript">
+        $(function () {
+            var url = "localhost:8080";
+            var csrfToken = /*[[${_csrf.token}]]*/ null;
+            var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
+            $(document).ajaxSend(function (e, xhr, options){
+                xhr.setRequestHeader(csrfHeader,csrfToken);
+            });
+            $("#accountmenu").click(function() {
+                var createTogetherList = document.querySelector("#createTogetherList")
+                var togetherList = document.querySelector("#togetherList")
+                $.ajax({
+                    url: '/togetherList',
+                    method: "GET",
+                    dataType: 'json',
+                    success: function(data) {
+                        if(data[0] == null)
+                            togetherList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>가입한 투게더가 없습니다.</h4>")
+                        $.each(data, function(index, value) {
+                            if(document.querySelector("#list" + value.path) == null) {
+                                togetherList.insertAdjacentHTML("beforeend", "<a class='dropdown-item' id='list" + value.path + "'>" + value.title + "</a>")
+                                var tagetherLink = document.querySelector("#list" + value.path)
+                                tagetherLink.setAttribute("href", "/together/" + value.path);
+                            }
+                        });
+                        var accordionButton = document.querySelector("#togetherAccordionButton")
+                        accordionButton.setAttribute("class", "accordion-button collapsed")
+                    }
+                    ,  error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    }
+                });
+                $.ajax({
+                    url: '/createTogetherList',
+                    method: "GET",
+                    dataType: 'json',
+                    success: function(data) {
+                        if(data[0] == null)
+                            togetherList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>만든 투게더가 없습니다.</h4>")
+                        $.each(data, function(index, value) {
+                            if(document.querySelector("#createlist" + value.path) == null) {
+                                createTogetherList.insertAdjacentHTML("beforeend", "<a class='dropdown-item' id='createlist" + value.path + "'>" + value.title + "</a>")
+                                var tagetherLink = document.querySelector("#createlist" + value.path)
+                                tagetherLink.setAttribute("href", "/together/" + value.path);
+                            }
+                        });
+                        var accordionButton = document.querySelector("#createTogetherAccordionButton")
+                        accordionButton.setAttribute("class", "accordion-button collapsed")
+                    }
+                    ,  error:function(request,status,error){
+                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                    }
+                });
+            })
+        })
+    </script>
 </header>
 <div th:fragment="footer" class="container">
     <footer class="py-3 my-4">
         <p class="text-center text-muted">© 2021 가치하자 프로젝트</p>
     </footer>
 </div>
-<script type="application/javascript" th:inline="javascript" th:fragment="csrf">
-    $(function () {
-        var csrfToken = /*[[${_csrf.token}]]*/ null;
-        var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
-        $(document).ajaxSend(function (e, xhr, options){
-            xhr.setRequestHeader(csrfHeader,csrfToken);
-        });
-    });
-</script>
+
 <div th:fragment="update-tags (baseUrl)">
     <script src="/node_modules/@yaireo/tagify/dist/tagify.min.js"></script>
     <script type="application/javascript" th:inline="javascript">
@@ -252,7 +339,7 @@
                     <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled></button>
         </span>
         <span th:if="${together.closed}" class="d-inline-block">
-                    <button class="btn btn-primary btn-sm" style="pointer-events: none;" type="button" disabled>종료</button>
+                    <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>종료됨</button>
         </span>
         <span sec:authorize="isAuthenticated()" th:if="${together.isJoinable(#authentication.principal)}"
               class="btn-group" role="group" aria-label="Basic example">
@@ -272,7 +359,7 @@
                         투게더 탈퇴
                     </a>
                     <a class="btn btn-outline-primary" th:href="@{'/together/' + ${together.path} + '/members'}"
-                       th:text="${together.members.size()}">1</a>
+                       th:text="${together.members.size()}"></a>
         </span>
     </div>
 </div>
@@ -287,7 +374,7 @@
         <a class="nav-item nav-link"  style="color: dimgray" th:classappend="${togetherMenu == 'board'}? active" th:href="@{'/together/' + ${together.path} + '/board'}">
             <i class="fa fa-clipboard"></i> 게시판
         </a>
-        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'events'}? active" th:href="@{'/together/' + ${together.path} + '/schedule'}">
+        <a class="nav-item nav-link" style="color: dimgray" th:classappend="${togetherMenu == 'schedule'}? active" th:href="@{'/together/' + ${together.path} + '/schedule'}">
             <i class="fa fa-calendar"></i> 일정
         </a>
         <a sec:authorize="isAuthenticated()" style="color: dimgray" th:if="${together.isManager(#authentication.principal)}"

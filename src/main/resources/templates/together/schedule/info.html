@@ -40,7 +40,7 @@
                     <span class="time" th:text="${schedule.end}"></span>
                 </div>
             </div>
-            <dd th:if="${schedule.getMembers().size() < schedule.maxMember}">
+            <dd th:if="${schedule.getMembers().size() < schedule.maxMember and schedule.start.isAfter(#temporals.createNow())}">
                 <form th:action="@{'/together/' + ${together.path} + '/schedule/' + ${schedule.id}+'/join'}" method="post">
                     <button th:if="${!schedule.isCondidate(#authentication.principal) and !schedule.isJoinable(#authentication.principal)}" type="submit" class="btn btn-outline-primary">
                         <i class="fa fa-plus-circle"></i> 참가 신청
@@ -53,9 +53,12 @@
                     <i class="fa fa-check-circle"></i> 참석 완료
                 </span>
             </dd>
-            <dt th:if="${schedule.getMembers().size() >= schedule.maxMember}">
-                <span class="text-danger" th:if="${schedule.isJoinable(#authentication.principal)}" disabled>
-                    <i class="fa fa-check-circle"></i> 마감
+            <dt>
+                <span class="text-danger" th:if="${schedule.getMembers().size() >= schedule.maxMember}" disabled>
+                    <i class="fa fa-check-circle"></i> 인원 모집 마감
+                </span>
+                <span class="text-danger" th:if="${schedule.start.isBefore(#temporals.createNow())}" disabled>
+                    <i class="fa fa-check-circle"></i> 일정 종료
                 </span>
             </dt>
         </dl>
@@ -63,19 +66,19 @@
         <dl>
             <dt class="h3" th:text="${schedule.introduce}"></dt>
             <dt th:if="${together.isManager(#authentication.principal)}" class="font-weight-light">일정 관리</dt>
-            <dd th:if="${together.isManager(#authentication.principal)}">
+            <dd th:if="${together.isManager(#authentication.principal) and schedule.start.isAfter(#temporals.createNow())}" >
                 <a class="btn btn-outline-primary btn-sm my-1"
                    th:href="@{'/together/' + ${together.path} + '/schedule/' + ${schedule.id} + '/edit'}" >
                     일정 수정
                 </a>
-                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancel">
+                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#remove">
                     일정 취소
                 </button>
             </dd>
         </dl>
             <dt class="font-weight-light" th:if="${together.isManager(#authentication.principal)}">참가 신청자</dt>
             <ul class="list-group" th:if="${together.isManager(#authentication.principal)}">
-                <li class="list-group-item d-flex align-items-start justify-content-between" th:each="member: ${schedule.candidates}">
+                <li class="list-group-item d-flex align-items-start justify-content-between" th:each="member: ${schedule.candidates}" th:if="${schedule.start.isAfter(#temporals.createNow())}">
                     <div>
                         <svg th:if="${#strings.isEmpty(member?.profileImage)}" th:data-jdenticon-value="${member.nickname}" width="24" height="24" class="rounded border bg-light"></svg>
                         <img th:if="${!#strings.isEmpty(member?.profileImage)}" th:src="${member?.profileImage}" width="24" height="24" class="rounded border bg-light"/>
@@ -88,6 +91,25 @@
                     </form>
                 </li>
             </ul>
+        </div>
+    </div>
+
+    <div class="modal fade" id="remove" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">일정 취소</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"> 일정을 취소하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <form method="post" th:action="@{'/together/' + ${together.path} + '/schedule/' + ${schedule.id} + '/remove'}" id="removeObject">
+                        <button id="removeButton" type="submit" class="btn btn-danger" >취소하기</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

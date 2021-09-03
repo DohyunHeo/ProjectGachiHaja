@@ -19,9 +19,11 @@
 * 모임을 위한 클래스 Togther
 * Together 검색
 * Together 내부 게시판
+* Together 모임 일정 표시
+* 에러 페이지
 
 # 남은 작업
-* Together 모임 일정 표시
 * 각종 알림
 * index 페이지
+* 처리 가능한 모든 곳에 validator 적용
 * REST API + OAuth 2.0 적용

@@ -1,9 +1,12 @@
-package com.example.projectgachihaja.Together;
+package com.example.projectgachihaja.Together.controller;
 
 import com.example.projectgachihaja.Post.Post;
 import com.example.projectgachihaja.Post.PostForm;
 import com.example.projectgachihaja.Post.PostRepository;
 import com.example.projectgachihaja.Post.PostService;
+import com.example.projectgachihaja.Together.Together;
+import com.example.projectgachihaja.Together.TogetherRepository;
+import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.CurrentAccount;
 import com.example.projectgachihaja.comment.Comment;

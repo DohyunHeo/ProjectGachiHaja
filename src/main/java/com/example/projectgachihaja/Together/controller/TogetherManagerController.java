@@ -1,5 +1,9 @@
-package com.example.projectgachihaja.Together;
+package com.example.projectgachihaja.Together.controller;
 
+import com.example.projectgachihaja.Together.Together;
+import com.example.projectgachihaja.Together.TogetherForm;
+import com.example.projectgachihaja.Together.TogetherRepository;
+import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.account.CurrentAccount;

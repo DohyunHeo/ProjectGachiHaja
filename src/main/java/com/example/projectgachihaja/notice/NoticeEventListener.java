@@ -8,10 +8,9 @@ import com.example.projectgachihaja.Together.event.TogetherUpdateEvent;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.Post.CommentNoticeToPostWriterEvent;
-import com.example.projectgachihaja.account.CurrentAccount;
 import com.example.projectgachihaja.schedule.Schedule;
-import com.example.projectgachihaja.schedule.ScheduleParticipationEvent;
 import com.example.projectgachihaja.schedule.ScheduleRepository;
+import com.example.projectgachihaja.schedule.event.ScheduleUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -60,16 +59,16 @@ public class NoticeEventListener {
     }
 
     @EventListener
-    public void scheduleParticipationEventHandler(ScheduleParticipationEvent scheduleParticipationEvent){
-        Together together = togetherRepository.findBySchedules(scheduleParticipationEvent.getSchedule());
-        Schedule schedule = scheduleRepository.findWithMembersById(scheduleParticipationEvent.getSchedule().getId());
+    public void scheduleUpdateEventHandler(ScheduleUpdateEvent scheduleUpdateEvent){
+        Together together = togetherRepository.findBySchedules(scheduleUpdateEvent.getSchedule());
+        Schedule schedule = scheduleRepository.findWithMembersById(scheduleUpdateEvent.getSchedule().getId());
 
-        createNotice(together,scheduleParticipationEvent.getAccount(),together.pathEncoder(),"모임 참석이 승인되었습니다.");
+        createNotice(together,scheduleUpdateEvent.getAccount(),together.pathEncoder()+"/schedule"+schedule.getId(),scheduleUpdateEvent.getMessage());
     }
 
     @EventListener
     public void commentNoticeToPostWriterEventHandler(CommentNoticeToPostWriterEvent commentEvent){
-        createNotice(commentEvent.getTogether(),commentEvent.getAccount(),commentEvent.getTogether().pathEncoder() + "/" + commentEvent.getPost().getId(),"회원님의 게시글에 새로운 댓글이 추가되었습니다.");
+        createNotice(commentEvent.getTogether(),commentEvent.getAccount(),commentEvent.getTogether().pathEncoder() + "/post/" + commentEvent.getPost().getId(),"회원님의 게시글에 새로운 댓글이 추가되었습니다.");
     }
 
     private void createNotice(Together together, Account account,String link, String message) {

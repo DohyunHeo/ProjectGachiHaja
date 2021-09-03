@@ -24,10 +24,39 @@
             color:black;
             text-decoration:none;
         }
+        ul.timeline {
+            list-style-type: none;
+            position: relative;
+        }
+        ul.timeline:before {
+            content: ' ';
+            background: #d4d9df;
+            display: inline-block;
+            position: absolute;
+            left: 29px;
+            width: 2px;
+            height: 100%;
+            z-index: 400;
+        }
+        ul.timeline > li {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        ul.timeline > li:before {
+            content: ' ';
+            background: white;
+            display: inline-block;
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #22c0e8;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            z-index: 400;
+        }
         .tagify--outside{
             border: 0;
         }
-
         .tagify--outside .tagify__input{
             order: -1;
             flex: 100%;
@@ -83,7 +112,7 @@
     </style>
 </head>
 <body>
-<header th:fragment="header" class="p-3 bg-dark text-white">
+<header th:fragment="header" class="p-3 bg-black text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a class="navbar-brand" th:href="@{/}">
@@ -106,9 +135,13 @@
                 </div>
                 <div sec:authorize="isAuthenticated()">
                     <a id="accountmenu" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-                        <span class="navbar-toggler-icon">
+                        <span class="navbar-toggler-icon" th:if="${newNotice}">
                             <svg th:if="${#strings.isEmpty(account?.profileImage)}" th:data-jdenticon-value="${#authentication.name}" width="32" height="32" class="rounded border bg-light"></svg>
-                            <img th:if="${!#strings.isEmpty(account?.profileImage)}" th:src="${account.getProfileImage()}" width="32" height="32" class="rounded border" >
+                            <img th:if="${!#strings.isEmpty(account?.profileImage)}" th:src="${account.getProfileImage()}" width="32" height="32" class="rounded border">
+                        </span>
+                        <span class="navbar-toggler-icon" th:if="${!newNotice}">
+                            <svg th:if="${#strings.isEmpty(account?.profileImage)}" th:data-jdenticon-value="${#authentication.name}" width="32" height="32" class="rounded border border-danger bg-light"></svg>
+                            <img th:if="${!#strings.isEmpty(account?.profileImage)}" th:src="${account.getProfileImage()}" width="32" height="32" class="rounded border border-danger">
                         </span>
                     </a>
                     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -120,6 +153,9 @@
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                                 <li class="nav-item">
                                     <a class="dropdown-item" th:href="@{'/profile/' + ${#authentication.name}}"><h2>프로필</h2></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="dropdown-item" th:href="@{'/notice'}"><h2>알림</h2></a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="dropdown-item" th:href="@{'/settings/profile'}"><h2>설정</h2></a>
@@ -134,6 +170,24 @@
                                     </form>
                                 </li>
                                 <div class="dropdown-divider"></div>
+                            </ul>
+                            <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                                <li class="nav-item">
+                                    <div class="accordion" id="newNoticeAccordion">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="newNoticeListAccordion">
+                                                <button id="newNoticeAccordionButton" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#newNoticeCollapse" aria-expanded="true" aria-controls="newNoticeCollapse">
+                                                    <h3>읽지 않은 알림</h3>
+                                                </button>
+                                            </h2>
+                                            <div id="newNoticeCollapse" class="accordion-collapse collapse" aria-labelledby="newNoticeListAccordion" data-bs-parent="#createTogetherAccordion">
+                                                <div class="accordion-body" id="newNoticeList">
+                                                    <a class="text-end" href="#" id="allCheck">전체 읽음 표시</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
                             </ul>
                             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
                                 <li class="nav-item">
@@ -177,57 +231,103 @@
     </div>
     <script type="application/javascript" th:inline="javascript">
         $(function () {
-            var url = "localhost:8080";
+            var loadcomplete = false
             var csrfToken = /*[[${_csrf.token}]]*/ null;
             var csrfHeader = /*[[${_csrf.headerName}]]*/ null;
-            $(document).ajaxSend(function (e, xhr, options){
-                xhr.setRequestHeader(csrfHeader,csrfToken);
+            $(document).ajaxSend(function (e, xhr, options) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
             });
-            $("#accountmenu").click(function() {
+            $("#accountmenu").click(function () {
                 var createTogetherList = document.querySelector("#createTogetherList")
                 var togetherList = document.querySelector("#togetherList")
-                $.ajax({
-                    url: '/togetherList',
-                    method: "GET",
-                    dataType: 'json',
-                    success: function(data) {
-                        if(data[0] == null)
-                            togetherList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>가입한 투게더가 없습니다.</h4>")
-                        $.each(data, function(index, value) {
-                            if(document.querySelector("#list" + value.path) == null) {
+                var newNoticeList = document.querySelector("#newNoticeList")
+                if(loadcomplete === false) {
+                    $.ajax({
+                        url: '/togetherList',
+                        method: "GET",
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data[0] == null)
+                                togetherList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>가입한 투게더가 없습니다.</h4>")
+                            $.each(data, function (index, value) {
                                 togetherList.insertAdjacentHTML("beforeend", "<a class='dropdown-item' id='list" + value.path + "'>" + value.title + "</a>")
                                 var tagetherLink = document.querySelector("#list" + value.path)
                                 tagetherLink.setAttribute("href", "/together/" + value.path);
-                            }
-                        });
-                        var accordionButton = document.querySelector("#togetherAccordionButton")
-                        accordionButton.setAttribute("class", "accordion-button collapsed")
-                    }
-                    ,  error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-                    }
-                });
-                $.ajax({
-                    url: '/createTogetherList',
-                    method: "GET",
-                    dataType: 'json',
-                    success: function(data) {
-                        if(data[0] == null)
-                            togetherList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>만든 투게더가 없습니다.</h4>")
-                        $.each(data, function(index, value) {
-                            if(document.querySelector("#createlist" + value.path) == null) {
+                            });
+                            var accordionButton = document.querySelector("#togetherAccordionButton")
+                            accordionButton.setAttribute("class", "accordion-button collapsed")
+                        }
+                        , error: function (request, status, error) {
+                            alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        }
+                    });
+                    $.ajax({
+                        url: '/createTogetherList',
+                        method: "GET",
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data[0] == null)
+                                togetherList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>만든 투게더가 없습니다.</h4>")
+                            $.each(data, function (index, value) {
                                 createTogetherList.insertAdjacentHTML("beforeend", "<a class='dropdown-item' id='createlist" + value.path + "'>" + value.title + "</a>")
                                 var tagetherLink = document.querySelector("#createlist" + value.path)
                                 tagetherLink.setAttribute("href", "/together/" + value.path);
-                            }
-                        });
-                        var accordionButton = document.querySelector("#createTogetherAccordionButton")
-                        accordionButton.setAttribute("class", "accordion-button collapsed")
-                    }
-                    ,  error:function(request,status,error){
-                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-                    }
-                });
+                            });
+                            var accordionButton = document.querySelector("#createTogetherAccordionButton")
+                            accordionButton.setAttribute("class", "accordion-button collapsed")
+                        }
+                        , error: function (request, status, error) {
+                            alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        }
+                    });
+                    $.ajax({
+                        url: '/newNotice',
+                        method: "GET",
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data[0] == null)
+                                newNoticeList.insertAdjacentHTML("beforeend", "<h4 class='text-black'>알림이 없습니다.</h4>")
+                            $.each(data, function (index, value) {
+                                newNoticeList.insertAdjacentHTML("beforeend", "<a class='dropdown-item notice' name='noticeList' id='createlist" + value.id + "'> <small>" + value.message +"<p>"+value.title+"</p>"+ "</small></a>")
+                                var noticeLink = document.querySelector("#createlist" + value.id)
+                                noticeLink.setAttribute("href", value.link);
+                            });
+                            var accordionButton = document.querySelector("#newNoticeAccordionButton")
+                            accordionButton.setAttribute("class", "accordion-button collapsed")
+                            loadcomplete = true;
+                        }
+                        , error: function (request, status, error) {
+                            alert("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                        }
+                    });
+                }
+            })
+            $(document).on("click","[name='noticeList']",function () {
+                var noticeId = this.id.substr(10,this.id.length-1)
+                $.ajax({
+                    dataType: "json",
+                    autocomplete: {
+                        enabled: true,
+                        rightKey: true,
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    method: "POST",
+                    url: '/newNotice',
+                    data: JSON.stringify({'id': noticeId})
+                })
+            })
+            $(document).on("click","[id='allCheck']",function () {
+                data = $(".notice").detach()
+                $.ajax({
+                    dataType: "json",
+                    autocomplete: {
+                        enabled: true,
+                        rightKey: true,
+                    },
+                    contentType: "application/json; charset=utf-8",
+                    method: "POST",
+                    url: '/noticeAllCheck'
+                })
             })
         })
     </script>

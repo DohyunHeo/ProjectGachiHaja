@@ -6,6 +6,12 @@ import com.example.projectgachihaja.Together.TogetherRepository;
 import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.CurrentAccount;
+import com.example.projectgachihaja.account.SettingsForm;
+import com.example.projectgachihaja.notice.Notice;
+import com.example.projectgachihaja.notice.NoticeList;
+import com.example.projectgachihaja.notice.NoticeService;
+import com.example.projectgachihaja.tag.Tag;
+import com.example.projectgachihaja.zone.Zone;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -13,9 +19,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -25,6 +34,7 @@ import java.util.List;
 public class HomeController {
     private final TogetherRepository togetherRepository;
     private final TogetherService togetherService;
+    private final NoticeService noticeService;
     private final ModelMapper modelMapper;
 
     @GetMapping("/")
@@ -65,5 +75,27 @@ public class HomeController {
     public List<TogetherList> togetherList(@CurrentAccount Account account) {
         List<Together> togethers = togetherService.togetherList(account);
         return modelMapper.map(togethers, new TypeToken<List<TogetherList>>() {}.getType());
+    }
+
+    @GetMapping("/newNotice")
+    @ResponseBody
+    public List<NoticeList> noticeList(@CurrentAccount Account account){
+        List<Notice> notices = noticeService.getUncheckedNotice(account);
+
+        return modelMapper.map(notices, new TypeToken<List<NoticeList>>() {}.getType());
+    }
+
+    @PostMapping("/newNotice")
+    @ResponseBody
+    public ResponseEntity noticeChecked(@CurrentAccount Account account, @RequestBody NoticeList noticeList, Model model){
+        noticeService.noticeCheck(noticeList);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/noticeAllCheck")
+    @ResponseBody
+    public ResponseEntity noticeAllCheck(@CurrentAccount Account account, Model model){
+        noticeService.allCheck(account);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,6 +1,9 @@
-package com.example.projectgachihaja.Together;
+package com.example.projectgachihaja.Together.controller;
 
 import com.example.projectgachihaja.Post.PostRepository;
+import com.example.projectgachihaja.Together.Together;
+import com.example.projectgachihaja.Together.TogetherRepository;
+import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.account.CurrentAccount;
@@ -59,7 +62,7 @@ public class TogetherScheduleController {
     public String togetherScheduleCreateComplete(@CurrentAccount Account account, @PathVariable String path, ScheduleForm scheduleForm) {
         Together together = togetherRepository.findWithSchedulesByPath(path);
         Schedule newSchedule = scheduleService.createNewSchedule(scheduleForm, account);
-        togetherService.addSchedule(together,newSchedule);
+        togetherService.addSchedule(together,account,newSchedule);
 
         return "redirect:/together/"+path+"/schedule";
     }
@@ -119,7 +122,7 @@ public class TogetherScheduleController {
     public String togetherScheduleRemove(@CurrentAccount Account account, @PathVariable String path,@PathVariable Long id){
         Together together = togetherRepository.findWithSchedulesByPath(path);
         Schedule schedule = scheduleRepository.findWithMembersById(id);
-        togetherService.removeSchedule(schedule,together);
+        togetherService.removeSchedule(schedule,account,together);
         scheduleService.removeSchedule(schedule);
         return "redirect:/together/"+path+"/schedule";
     }

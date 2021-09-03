@@ -1,7 +1,7 @@
 package com.example.projectgachihaja.schedule;
 
-import com.example.projectgachihaja.Together.Together;
 import com.example.projectgachihaja.account.Account;
+import com.example.projectgachihaja.schedule.event.ScheduleUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,7 +33,7 @@ public class ScheduleService {
     public void scheduleRegistrationApproval(Account candidate, Schedule schedule) {
         schedule.getCandidates().remove(candidate);
         schedule.getMembers().add(candidate);
-        eventPublisher.publishEvent(new ScheduleParticipationEvent(schedule, candidate));
+        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule, candidate,"모임 참석이 승인되었습니다."));
     }
 
     public void editSchedule(Schedule schedule, ScheduleForm scheduleForm) {

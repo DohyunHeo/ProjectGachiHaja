@@ -1,6 +1,9 @@
 package com.example.projectgachihaja.account;
 
 
+import com.example.projectgachihaja.notice.Notice;
+import com.example.projectgachihaja.notice.NoticeList;
+import com.example.projectgachihaja.notice.NoticeRepository;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.tag.TagRepository;
 import com.example.projectgachihaja.tag.TagService;
@@ -37,6 +40,7 @@ public class AccountController {
     private final ObjectMapper objectMapper;
     private final TagService tagService;
     private final ZoneService zoneService;
+    private final NoticeRepository noticeRepository;
 
     @InitBinder("createAccountForm")
     public void initBinder(WebDataBinder webDataBinder){
@@ -88,6 +92,15 @@ public class AccountController {
 
 
         return "account/profile";
+    }
+
+    @GetMapping("/notice")
+    public String noticeView(@CurrentAccount Account account, Model model){
+        List<Notice> notices = noticeRepository.findAllByAccount(account);
+        NoticeList noticeList = new NoticeList();
+        model.addAttribute(noticeList);
+        model.addAttribute("notices",notices);
+        return "account/notice";
     }
 
     @GetMapping("/settings/{nickname}")

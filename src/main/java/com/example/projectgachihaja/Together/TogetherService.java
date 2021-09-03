@@ -8,6 +8,7 @@ import com.example.projectgachihaja.Together.event.TogetherUpdateEvent;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.schedule.Schedule;
+import com.example.projectgachihaja.schedule.event.ScheduleUpdateEvent;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.RequiredArgsConstructor;
@@ -121,14 +122,14 @@ public class TogetherService {
         together.getPosts().remove(post);
     }
 
-    public void addSchedule(Together together, Schedule newSchedule) {
+    public void addSchedule(Together together,Account account, Schedule newSchedule) {
         together.getSchedules().add(newSchedule);
-        eventPublisher.publishEvent(new TogetherUpdateEvent(together,"일정이 추가되었습니다."));
+        eventPublisher.publishEvent(new ScheduleUpdateEvent(newSchedule,account,"일정이 추가되었습니다."));
     }
 
-    public void removeSchedule(Schedule schedule, Together together) {
+    public void removeSchedule(Schedule schedule,Account account, Together together) {
         together.getSchedules().remove(schedule);
-        eventPublisher.publishEvent(new TogetherUpdateEvent(together,"일정이 취소되었습니다."));
+        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule,account,"일정이 취소되었습니다."));
     }
 
     public List<Together> togetherList(Account account) {

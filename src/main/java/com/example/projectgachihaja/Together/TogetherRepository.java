@@ -14,8 +14,8 @@ public interface TogetherRepository extends JpaRepository<Together, Long>, Toget
     @EntityGraph(attributePaths = {"members","candidates","managers","tags","zones"})
     Together findByPath(String path);
 
-    @EntityGraph(attributePaths = {"schedules","members","managers"})
-    Together findWithSchedulesByPath(String path);
+    @EntityGraph(attributePaths = {"members","candidates","managers"})
+    Together findWithDefaultInfoByPath(String path);
 
     @EntityGraph(attributePaths = {"candidates"})
     Together findTogetherWithCandidatesByPath(String path);
@@ -34,7 +34,9 @@ public interface TogetherRepository extends JpaRepository<Together, Long>, Toget
     @EntityGraph(attributePaths ={"members","managers"})
     Together findWithManagersAndMembersById(Long id);
 
-    Together findBySchedules(Schedule schedule);
-
     List<Together> findByManagers(Account account);
+
+    boolean existsByTitle(String title);
+
+    boolean existsByPath(String path);
 }

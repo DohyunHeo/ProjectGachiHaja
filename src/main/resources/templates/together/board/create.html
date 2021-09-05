@@ -8,27 +8,31 @@
 <div class="container">
     <div th:replace="fragments.html :: together-info"></div>
     <div th:replace="fragments.html :: together-menu (board)"></div>
-    <div class="py-5 text-center">
+    <div class="text-center py-1">
         <h2>글 작성</h2>
     </div>
     <div class="row justify-content-center">
         <form class="needs-validation col-sm-10" th:action="@{'/together/' + ${together.path} + '/board/create'}" th:object="${postForm}" method="post" novalidate>
-            <div class="form-group mt-2">
-                <label for="title">제목</label>
-                <input id="title" type="text" th:field="*{title}" class="form-control" required max="20">
-                <small class="invalid-feedback">글 제목을 입력해주세요.</small>
-                <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
-            </div>
-            <div class="form-group mt-2">
-                <label for="togetherType" class="form-label">투게더의 형식</label>
+            <div class="form-group">
+                <label for="togetherType" class="form-label">유형</label>
                 <p>
                     <select id="togetherType" th:field="*{postType}">
-                        <option th:each="type : ${T(com.example.projectgachihaja.Post.PostType).values()}"
+                        <option th:if="${together.isManager(#authentication.principal)}" th:each="type : ${T(com.example.projectgachihaja.Post.PostType).values()}"
+                                th:value="${type}"
+                                th:text="${type.getKrName()}">
+                        </option>
+                        <option th:if="${!together.isManager(#authentication.principal) and type.getType() == 'member'}" th:each="type : ${T(com.example.projectgachihaja.Post.PostType).values()}"
                                 th:value="${type}"
                                 th:text="${type.getKrName()}">
                         </option>
                     </select>
                 </p>
+            </div>
+            <div class="form-group mt-2">
+                <label for="title">제목</label>
+                <input id="title" type="text" th:field="*{title}" class="form-control" required max="20">
+                <small class="invalid-feedback">글 제목을 입력해주세요.</small>
+                <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
             </div>
             <div class="form-group mt-2">
                 <label for="longIntroduce">내용</label>

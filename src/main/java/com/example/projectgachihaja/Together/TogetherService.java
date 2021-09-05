@@ -122,16 +122,6 @@ public class TogetherService {
         together.getPosts().remove(post);
     }
 
-    public void addSchedule(Together together,Account account, Schedule newSchedule) {
-        together.getSchedules().add(newSchedule);
-        eventPublisher.publishEvent(new ScheduleUpdateEvent(newSchedule,account,"일정이 추가되었습니다."));
-    }
-
-    public void removeSchedule(Schedule schedule,Account account, Together together) {
-        together.getSchedules().remove(schedule);
-        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule,account,"일정이 취소되었습니다."));
-    }
-
     public List<Together> togetherList(Account account) {
         return togetherRepository.findByMembers(account);
     }
@@ -142,5 +132,9 @@ public class TogetherService {
 
     public List<Together> createTogetherList(Account account) {
         return togetherRepository.findByManagers(account);
+    }
+
+    public void bannerUpdate(Together together, String image) {
+        together.setBanner(image);
     }
 }

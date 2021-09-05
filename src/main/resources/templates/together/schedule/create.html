@@ -8,7 +8,8 @@
 <div class="container">
     <div th:replace="fragments.html :: together-info"></div>
     <div th:replace="fragments.html :: together-menu (schedule)"></div>
-    <form class="justify-content-center needs-validation" th:action="@{'/together/' + ${together.path} + '/schedule/create'}" th:object="${scheduleForm}" method="post" novalidate>
+    <div class="row justify-content-center">
+    <form class="col-sm-10 needs-validation" th:action="@{'/together/' + ${together.path} + '/schedule/create'}" th:object="${scheduleForm}" method="post" novalidate>
         <div class="form-group">
             <label for="title" class="h4 mt-3">일정 이름</label>
             <input id="title" type="text" th:field="*{title}" class="form-control"
@@ -27,29 +28,29 @@
                 <small id="limitOfEnrollmentsHelp" class="form-text text-muted">
                     최대 수용 가능한 일정 참석 인원을 설정하세요. 최소 2인 이상 일정이어야 합니다.
                 </small>
-                <small class="invalid-feedback">일정 신청 마감 일시를 입력하세요.</small>
+                <small class="invalid-feedback">일정 신청 마감 일시를 입력하세요.</small> <br>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('maxMember')}" th:errors="*{maxMember}">Error</small>
-                <div class="form-row">
-            <div class="form-group col-md-12">
-                <label for="startDate" class="h4 mt-3">일정 시작 일시</label>
-                <input id="startDate" type="datetime-local" th:field="*{start}" class="form-control"
-                       aria-describedby="startDateHelp" required>
-                <small id="startDateHelp" class="form-text text-muted">
-                    일정 시작 일시를 입력하세요. 상세한 일정 일정은 본문에 적어주세요.
-                </small>
-                <small class="invalid-feedback">일정 시작 일시를 입력하세요.</small>
-                <small class="form-text text-danger" th:if="${#fields.hasErrors('start')}" th:errors="*{start}">Error</small>
-            </div>
-            <div class="form-group col-md-12">
-                <label for="endDate" class="h4 mt-3">일정 종료 일시</label>
-                <input id="endDate" type="datetime-local" th:field="*{end}" class="form-control"
-                       aria-describedby="endDateHelp" required>
-                <small id="endDateHelp" class="form-text text-muted">
-                    일정 종료 일시가 지나면 일정은 자동으로 종료 상태로 바뀝니다.
-                </small>
-                <small class="invalid-feedback">일정 종료 일시를 입력하세요.</small>
-                <small class="form-text text-danger" th:if="${#fields.hasErrors('end')}" th:errors="*{end}">Error</small>
-            </div>
+                <div class="d-flex">
+                    <div class="form-group col-md-6">
+                        <label for="startDate" class="h4 mt-3">일정 시작 일시</label>
+                        <input id="startDate" type="datetime-local" th:field="*{start}" class="form-control"
+                               aria-describedby="startDateHelp" required>
+                        <small id="startDateHelp" class="form-text text-muted">
+                            일정 시작 일시를 입력하세요. 상세한 일정 일정은 본문에 적어주세요.
+                        </small>
+                        <small class="invalid-feedback">일정 시작 일시를 입력하세요.</small> <br>
+                        <small class="form-text text-danger" th:if="${#fields.hasErrors('start')}" th:errors="*{start}">Error</small>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="endDate" class="h4 mt-3">일정 종료 일시</label>
+                        <input id="endDate" type="datetime-local" th:field="*{end}" class="form-control"
+                               aria-describedby="endDateHelp" required>
+                        <small id="endDateHelp" class="form-text text-muted">
+                            일정 종료 일시가 지나면 일정은 자동으로 종료 상태로 바뀝니다.
+                        </small>
+                        <small class="invalid-feedback">일정 종료 일시를 입력하세요.</small> <br>
+                        <small class="form-text text-danger" th:if="${#fields.hasErrors('end')}" th:errors="*{end}">Error</small>
+                    </div>
                 </div>
         </div>
         <div class="form-group">
@@ -67,8 +68,27 @@
                     aria-describedby="submitHelp" th:text="${'일정 만들기'}"></button>
         </div>
     </form>
-</div>
+    </div>
 </div>
 <div th:replace="fragments.html :: footer"></div>
+<script type="application/javascript" th:fragment="form-validation">
+    (function (){
+        'use strict';
+        window.addEventListener('load', function ()
+        {
+            const forms = document.getElementsByClassName('needs-validation');
+
+            Array.prototype.filter.call(forms, function (form){
+                form.addEventListener('submit',function (event){
+                    if (form.checkValidity() === false){
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        },false)
+    }())
+</script>
 </body>
 </html>

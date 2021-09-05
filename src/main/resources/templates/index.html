@@ -18,26 +18,26 @@
     </div>
 </div>
 <div class="container" sec:authorize="isAuthenticated()">
-    <div class="position-relative overflow-hidden m-md-3 text-center">
-        <div class="col-md-12 mx-auto my-5">
-            <h1 class="display-3 fw-normal" th:text="${account.nickname} +'님 어서오세요'"></h1>
-            <p class="lead fw-normal">모임 웹 서비스 가치하자</p>
-            <a class="btn btn-outline-dark">회원가입</a>
+    <div class="position-relative overflow-hidden text-center">
+        <div class="col-md-12 mx-auto my-3">
+            <h1 class="display-3 fw-normal" th:text="'또 뵙네요, '+${account.nickname} + '님'"></h1>
+            <p class="lead fw-normal">새로운 정보들을 확인해 볼까요?</p>
         </div>
     </div>
 </div>
-<div class="row justify-content-center">
+<div class="row justify-content-center" sec:authorize="!isAuthenticated()">
     <div class="col-sm-10">
         <div class="tracking h2 text-center">가치있는 시간을 만들어봐요</div>
         <div class="row p-4">
             <div class="col-md-3 tracking" th:each="together: ${togetherPage}" th:classappend="i == ${togetherPage.size()}">
                 <div class="card mb-3 shadow-sm">
-                    <img th:src="${together.banner}" class="context card-img-top" th:alt="${together.banner}">
+                    <img src="images/DefualtTogetherBanner.png" th:if="${!together.useBanner}" class="context card-img-top" th:alt="${together.banner}">
+                    <img th:src="${together.banner}" th:if="${together.useBanner}" class="context card-img-top" th:alt="${together.banner}">
                      <div class="card-body">
                          <div class="d-flex justify-content-between align-items-center">
-                        <a th:href="@{'/together/' + ${together.path}}" class="text-decoration-none">
-                            <h5 class="card-text context" th:text="${together.title}"></h5>
-                        </a>
+                            <a th:href="@{'/together/' + ${together.path}}" class="text-decoration-none">
+                                <h5 class="card-text context" th:text="${together.title}"></h5>
+                            </a>
                              <span class="d-inline-block">
                                  <button class="btn btn-outline-dark btn-sm" th:text="${together.togetherType.krName}" style="pointer-events: none;" type="button" disabled></button>
                              </span>
@@ -47,23 +47,91 @@
                             <span th:if="${together.tags.size() == 0} and ${together.zones.size() == 0}" class="d-inline-block">
                                 <button class="btn btn-outline-dark btn-sm" th:text="${'주제없음'}" style="pointer-events: none;" type="button" disabled></button>
                             </span>
-                                    <span th:each="tag: ${together.tags}" class="d-inline-block">
-                                        <button class="btn btn-outline-dark btn-sm" th:text="${tag.title}" style="pointer-events: none;" type="button" disabled></button>
-                                    </span>
+                            <span th:each="tag: ${together.tags}" class="d-inline-block">
+                                <button class="btn btn-outline-dark btn-sm" th:text="${tag.title}" style="pointer-events: none;" type="button" disabled></button>
+                            </span>
                             <span th:each="zone: ${together.zones}" class="d-inline-block">
-                                     <button class="btn btn-outline-dark btn-sm" th:text="${zone.city}" style="pointer-events: none;" type="button" disabled></button>
-                                </span>
+                                <button class="btn btn-outline-dark btn-sm" th:text="${zone.city}" style="pointer-events: none;" type="button" disabled></button>
+                            </span>
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
                                 <i class="fa fa-user-circle"></i>
-                                <span th:text="${together.members.size()}"></span>명
+                                <span th:text="${together.numberOfPeople()}"></span>명
                             </small>
                             <small class="text-muted date" th:text="${together.publishedDateTime}"></small>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center py-3" sec:authorize="isAuthenticated()">
+    <div class="row justify-content-center">
+        <span class="text-center h3 tracking">일정 일람</span>
+        <div th:if="${scheduleList.size() == 0}" class="text-center h4 tracking">현재 참가하신 일정이 없습니다.</div>
+        <div class="col-6">
+            <div class="row">
+                <div class="col-md-6 tracking" th:each="schedule: ${scheduleList}">
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a th:href="@{'/together/' + ${schedule.together.path} + '/schedule/' + ${schedule.id}}" class="text-decoration-none">
+                                    <h5 class="card-text context" th:text="${schedule.title}"></h5>
+                                </a>
+                                <a th:href="@{'/together/' + ${schedule.together.path}}" class="text-decoration-none">
+                                    <h6 class="card-text context" th:text="${schedule.together.title}"></h6>
+                                </a>
+                            </div>
+                            <p class="card-text" th:text="${schedule.introduce}">짧은 소개</p>
+                            <div class="d-flex">
+                                <div class="col-6">
+                                <small class="text-muted">
+                                    <i class="fa fa-user-circle"></i>
+                                    현재 <span th:text="${schedule.getMembers().size()}"></span>명 참석
+                                </small>
+                                </div>
+                                <div class="col-6 text-end">
+                                <i class="fa fa-calendar"></i> <small class="text-muted date-time" th:text="${schedule.start}"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 py-5">
+        <span class="h3 tracking">추천 투게더</span>
+        <div id="carouselCaptions" class="carousel slide tracking" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#carouselCaptions" th:each="together : ${togetherList}" th:data-bs-slide-to="${togetherStat.index}" class="active" aria-current="true"></button>
+            </div>
+            <div class="carousel-inner">
+                <div th:class="${togetherStat.index} == 0  ? 'carousel-item active':'carousel-item'" th:each="together : ${togetherList}">
+                    <img src="images/DefualtTogetherBanner.png" th:if="${together.banner == null}" height="156px" class="d-block w-100">
+                    <img th:src="${together.banner}" th:if="${together.banner != null}" height="156px" class="d-block w-100">
+                    <div class="carousel-caption d-none d-md-block">
+                        <a class="h5 text-white text-shadow" th:href="@{'/together/' + ${together.path}}" th:text="${together.title}"></a><br>
+                        <span th:each="tag: ${together.tags}" class="d-inline-block">
+                            <button class="btn btn-light btn-sm" th:text="${tag.title}" style="pointer-events: none;" type="button" disabled></button>
+                        </span>
+                        <span th:each="zone: ${together.zones}" class="d-inline-block">
+                            <button class="btn btn-light btn-sm" th:text="${zone.city}" style="pointer-events: none;" type="button" disabled></button>
+                        </span>
+                        <p class="text-shadow" th:text="${together.shortIntroduce}"></p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselCaptions" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselCaptions" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 </div>

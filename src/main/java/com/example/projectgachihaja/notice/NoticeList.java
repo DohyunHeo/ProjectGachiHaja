@@ -12,5 +12,5 @@ public class NoticeList {
     String message;
     String link;
 
-    public Comparator<Notice> noticeComparator = (o1, o2) -> o1.getCreatedTime().compareTo(o2.getCreatedTime());
+    public Comparator<Notice> noticeComparator = (o1, o2) -> o2.getCreatedTime().compareTo(o1.getCreatedTime());
 }

@@ -31,9 +31,7 @@
             <small id="introduceHelp" class="form-text text-muted">
               짧게 자신을 소개해보세요.
             </small>
-            <small class="form-text text-danger" th:if="${#fields.hasErrors('introduce')}" th:errors="*{introduce}">
-              짧게요....
-            </small>
+            <small class="form-text text-danger" th:if="${#fields.hasErrors('introduce')}" th:errors="*{introduce}"></small>
           </div>
           <div class="form-group mt-1">
             <label for="job">직업</label>

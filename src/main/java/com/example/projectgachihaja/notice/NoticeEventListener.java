@@ -4,12 +4,14 @@ import com.example.projectgachihaja.Together.Together;
 import com.example.projectgachihaja.Together.TogetherRepository;
 import com.example.projectgachihaja.Together.event.TogetherCreateEvent;
 import com.example.projectgachihaja.Together.event.TogetherJoinEvent;
+import com.example.projectgachihaja.Together.event.TogetherNoticeEvent;
 import com.example.projectgachihaja.Together.event.TogetherUpdateEvent;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.Post.CommentNoticeToPostWriterEvent;
 import com.example.projectgachihaja.schedule.Schedule;
 import com.example.projectgachihaja.schedule.ScheduleRepository;
+import com.example.projectgachihaja.schedule.event.ScheduleJoinEvent;
 import com.example.projectgachihaja.schedule.event.ScheduleUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -59,16 +61,36 @@ public class NoticeEventListener {
     }
 
     @EventListener
-    public void scheduleUpdateEventHandler(ScheduleUpdateEvent scheduleUpdateEvent){
-        Together together = togetherRepository.findBySchedules(scheduleUpdateEvent.getSchedule());
-        Schedule schedule = scheduleRepository.findWithMembersById(scheduleUpdateEvent.getSchedule().getId());
+    public void togetherNoticeEventHandler(TogetherNoticeEvent togetherNoticeEvent){
+        Together together = togetherRepository.findWithManagersAndMembersById(togetherNoticeEvent.getTogether().getId());
+        Set<Account> accounts = new HashSet<>();
+        accounts.addAll(together.getManagers());
+        accounts.addAll(together.getMembers());
+        accounts.forEach(account -> {
+            createNotice(together,account,together.pathEncoder()+"/board/"+togetherNoticeEvent.getPost().getId(),togetherNoticeEvent.getMessage());
+        });
+    }
 
-        createNotice(together,scheduleUpdateEvent.getAccount(),together.pathEncoder()+"/schedule"+schedule.getId(),scheduleUpdateEvent.getMessage());
+    @EventListener
+    public void scheduleUpdateEventHandler(ScheduleUpdateEvent scheduleUpdateEvent){
+        Together together = togetherRepository.findWithDefaultInfoByPath(scheduleUpdateEvent.getTogether().getPath());
+        Schedule schedule = scheduleRepository.findWithMembersById(scheduleUpdateEvent.getSchedule().getId());
+        Set<Account> members = together.getMembers();
+        members.forEach(account -> {
+            createNotice(together,account,together.pathEncoder()+"/schedule/"+schedule.getId(),scheduleUpdateEvent.getMessage());
+        });
+    }
+
+    @EventListener
+    public void scheduleJoinEventHandler(ScheduleJoinEvent scheduleJoinEvent){
+        Together together = togetherRepository.findWithDefaultInfoByPath(scheduleJoinEvent.getTogether().getPath());
+        Schedule schedule = scheduleRepository.findWithMembersById(scheduleJoinEvent.getSchedule().getId());
+        createNotice(together, scheduleJoinEvent.getAccount(),together.pathEncoder()+"/schedule/"+schedule.getId(),scheduleJoinEvent.getMessage());
     }
 
     @EventListener
     public void commentNoticeToPostWriterEventHandler(CommentNoticeToPostWriterEvent commentEvent){
-        createNotice(commentEvent.getTogether(),commentEvent.getAccount(),commentEvent.getTogether().pathEncoder() + "/post/" + commentEvent.getPost().getId(),"회원님의 게시글에 새로운 댓글이 추가되었습니다.");
+        createNotice(commentEvent.getTogether(),commentEvent.getAccount(),commentEvent.getTogether().pathEncoder() + "/board/" + commentEvent.getPost().getId(),"회원님의 게시글에 새로운 댓글이 추가되었습니다.");
     }
 
     private void createNotice(Together together, Account account,String link, String message) {

@@ -1,5 +1,6 @@
 package com.example.projectgachihaja.schedule;
 
+import com.example.projectgachihaja.Together.Together;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.UserAccount;
 import lombok.*;
@@ -39,6 +40,9 @@ public class Schedule {
 
     @ManyToOne
     private Account manager;
+
+    @ManyToOne
+    private Together together;
 
     @ManyToMany
     private Set<Account> members = new HashSet<>();

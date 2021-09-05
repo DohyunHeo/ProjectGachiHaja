@@ -5,13 +5,13 @@ import com.example.projectgachihaja.Together.TogetherList;
 import com.example.projectgachihaja.Together.TogetherRepository;
 import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
+import com.example.projectgachihaja.account.AccountRepository;
 import com.example.projectgachihaja.account.CurrentAccount;
-import com.example.projectgachihaja.account.SettingsForm;
 import com.example.projectgachihaja.notice.Notice;
 import com.example.projectgachihaja.notice.NoticeList;
 import com.example.projectgachihaja.notice.NoticeService;
-import com.example.projectgachihaja.tag.Tag;
-import com.example.projectgachihaja.zone.Zone;
+import com.example.projectgachihaja.schedule.Schedule;
+import com.example.projectgachihaja.schedule.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
+    private final AccountRepository accountRepository;
+    private final ScheduleRepository scheduleRepository;
     private final TogetherRepository togetherRepository;
     private final TogetherService togetherService;
     private final NoticeService noticeService;
@@ -40,10 +43,16 @@ public class HomeController {
     @GetMapping("/")
     public String home(@CurrentAccount Account account, Model model){
         if (account != null){
-            model.addAttribute(account);
+            Account accountFullInfo = accountRepository.findWithTagsAndZonesByNickname(account.getNickname());
+            List<Schedule> scheduleList = scheduleRepository.findAllByMembersAndStartAfterOrderByStartDesc(account, LocalDateTime.now());
+            model.addAttribute(accountFullInfo);
+            model.addAttribute("togetherList",togetherRepository.findFist5WithNewTogetherByAccount(accountFullInfo));
+            model.addAttribute("scheduleList", scheduleRepository.findAllByMembersAndStartAfterOrderByStartDesc(account, LocalDateTime.now()));
         }
-        List<Together> togetherList = togetherRepository.findFirst8ByPublishedAndClosedOrderByPublishedDateTimeDesc(true, false);
-        model.addAttribute("togetherPage", togetherList);
+        else {
+            List<Together> togetherList = togetherRepository.findFirst8ByPublishedAndClosedOrderByPublishedDateTimeDesc(true, false);
+            model.addAttribute("togetherPage", togetherList);
+        }
         return "index";
     }
 

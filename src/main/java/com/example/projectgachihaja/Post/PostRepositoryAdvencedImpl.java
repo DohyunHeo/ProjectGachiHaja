@@ -35,13 +35,4 @@ public class PostRepositoryAdvencedImpl extends QuerydslRepositorySupport implem
         QueryResults<Post> postQueryResults = pageableQuery.fetchResults();
         return new PageImpl<>(postQueryResults.getResults(), pageable, postQueryResults.getTotal());
     }
-
-    @Override
-    public Page<Post> findWithAllPage(Pageable pageable) {
-        QPost post = QPost.post;
-        JPQLQuery<Post> query = from(post);
-        JPQLQuery<Post> pageableQuery = getQuerydsl().applyPagination(pageable, query);
-        QueryResults<Post> postQueryResults = pageableQuery.fetchResults();
-        return new PageImpl<>(postQueryResults.getResults(), pageable, postQueryResults.getTotal());
-    }
 }

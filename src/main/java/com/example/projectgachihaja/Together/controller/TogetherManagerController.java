@@ -59,6 +59,12 @@ public class TogetherManagerController {
 
         return "/together/settings";
     }
+    @PostMapping("/together/{path}/settings/banner")
+    public String togetherBanner(@CurrentAccount Account account, @PathVariable String path, String image){
+        Together together = togetherService.managerCheck(account,path);
+        togetherService.bannerUpdate(together,image);
+        return "redirect:/together/"+together.getPath()+"/settings";
+    }
 
     @PostMapping("/together/{path}/settings/banner/enable")
     public String enableTogetherBanner(@CurrentAccount Account account, @PathVariable String path){

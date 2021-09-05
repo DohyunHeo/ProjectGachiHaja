@@ -57,7 +57,10 @@
                 <span class="text-danger" th:if="${schedule.getMembers().size() >= schedule.maxMember}" disabled>
                     <i class="fa fa-check-circle"></i> 인원 모집 마감
                 </span>
-                <span class="text-danger" th:if="${schedule.start.isBefore(#temporals.createNow())}" disabled>
+                <span class="text-primary" th:if="${schedule.start.isBefore(#temporals.createNow()) and schedule.end.isAfter(#temporals.createNow())}" disabled>
+                    <i class="fa fa-check-circle"></i> 일정 진행중
+                </span>
+                <span class="text-danger" th:if="${schedule.end.isBefore(#temporals.createNow())}" disabled>
                     <i class="fa fa-check-circle"></i> 일정 종료
                 </span>
             </dt>

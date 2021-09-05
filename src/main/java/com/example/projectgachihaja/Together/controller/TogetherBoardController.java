@@ -16,6 +16,7 @@ import com.example.projectgachihaja.comment.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -25,6 +26,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,10 +46,14 @@ public class TogetherBoardController {
     public String togetherBoardView(@CurrentAccount Account account, @PathVariable String path,
                                     @PageableDefault(size = 9,sort="reportingDate", direction = Sort.Direction.DESC) Pageable pageable, Model model){
         Together together = togetherRepository.findWithPostsByPath(path);
-        Page<Post> postPage = postRepository.findWithAllPage(pageable);
+        List<Post> postList = List.copyOf(together.getPosts("user"));
+        int start = (int)pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), postList.size());
+        Page<Post> postPage = new PageImpl<>(postList.subList(start, end), pageable, postList.size());
 
         model.addAttribute(together);
         model.addAttribute(account);
+        model.addAttribute("noticePost", together.getPosts("notice"));
         model.addAttribute("postPage",postPage);
         model.addAttribute("sortProperty", pageable.getSort().toString().contains("reportingDate") ? "reportingDate" : "memberCount");
 
@@ -67,7 +74,7 @@ public class TogetherBoardController {
     @PostMapping("/together/{path}/board/create")
     public String togetherPostCreateComplete(@CurrentAccount Account account, @PathVariable String path, PostForm postForm){
         Together together = togetherRepository.findByPath(path);
-        Post newPost = postService.createNewPost(postForm, account);
+        Post newPost = postService.createNewPost(postForm,together, account);
         togetherService.newPostRegister(together,newPost);
 
         return "redirect:/together/" +together.getPath() + "/board/" +newPost.getId();

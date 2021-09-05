@@ -1,5 +1,6 @@
 package com.example.projectgachihaja.Post;
 
+import com.example.projectgachihaja.Together.Together;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.UserAccount;
 import com.example.projectgachihaja.comment.Comment;

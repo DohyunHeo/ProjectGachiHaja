@@ -1,6 +1,8 @@
 package com.example.projectgachihaja.schedule;
 
+import com.example.projectgachihaja.Together.Together;
 import com.example.projectgachihaja.account.Account;
+import com.example.projectgachihaja.schedule.event.ScheduleJoinEvent;
 import com.example.projectgachihaja.schedule.event.ScheduleUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,9 +18,11 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public Schedule createNewSchedule(ScheduleForm scheduleForm, Account account) {
+    public Schedule createNewSchedule(ScheduleForm scheduleForm, Together together, Account account) {
         Schedule schedule = modelMapper.map(scheduleForm, Schedule.class);
         schedule.setManager(account);
+        schedule.setTogether(together);
+        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule.getTogether(),schedule,"새로운 일정이 등록되었습니다."));
         return scheduleRepository.save(schedule);
     }
 
@@ -33,7 +37,7 @@ public class ScheduleService {
     public void scheduleRegistrationApproval(Account candidate, Schedule schedule) {
         schedule.getCandidates().remove(candidate);
         schedule.getMembers().add(candidate);
-        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule, candidate,"모임 참석이 승인되었습니다."));
+        eventPublisher.publishEvent(new ScheduleJoinEvent(schedule.getTogether(), candidate,schedule,"일정 참석이 승인되었습니다."));
     }
 
     public void editSchedule(Schedule schedule, ScheduleForm scheduleForm) {
@@ -41,9 +45,11 @@ public class ScheduleService {
         schedule.setStart(scheduleForm.getStart());
         schedule.setEnd(scheduleForm.getEnd());
         schedule.setTitle(scheduleForm.getTitle());
+        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule.getTogether(),schedule,"일정의 정보가 수정되었습니다."));
     }
 
     public void removeSchedule(Schedule schedule) {
+        eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule.getTogether(),schedule,"일정이 취소되었습니다."));
         scheduleRepository.delete(schedule);
     }
 }

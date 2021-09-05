@@ -1,6 +1,8 @@
 package com.example.projectgachihaja.Post;
 
 import com.example.projectgachihaja.Together.Together;
+import com.example.projectgachihaja.Together.event.TogetherNoticeEvent;
+import com.example.projectgachihaja.Together.event.TogetherUpdateEvent;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.comment.Comment;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +22,14 @@ public class PostService {
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-    public Post createNewPost(PostForm postForm, Account writer) {
+    public Post createNewPost(PostForm postForm, Together together, Account writer) {
         Post post = modelMapper.map(postForm, Post.class);
         post.setWriter(writer);
         post.setReportingDate(LocalDateTime.now());
+
+        if(post.getPostType() == PostType.NOTICE){
+            eventPublisher.publishEvent(new TogetherNoticeEvent(together,post,"새로운 공지가 등록되었습니다."));
+        }
         return postRepository.save(post);
     }
 

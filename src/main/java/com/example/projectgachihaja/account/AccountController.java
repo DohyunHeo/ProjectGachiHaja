@@ -98,6 +98,7 @@ public class AccountController {
     public String noticeView(@CurrentAccount Account account, Model model){
         List<Notice> notices = noticeRepository.findAllByAccount(account);
         NoticeList noticeList = new NoticeList();
+        model.addAttribute(account);
         model.addAttribute(noticeList);
         model.addAttribute("notices",notices);
         return "account/notice";
@@ -164,4 +165,6 @@ public class AccountController {
         }
         return ResponseEntity.ok().build();
     }
+
+
 }

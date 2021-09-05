@@ -19,6 +19,7 @@
                     한글, 영문, 숫자, 대시(-), 언더바(_)를 사용하여 2자 이상 20자 이내로 입력하세요. 투게더의 주소로 사용됩니다.
                 </small>
                 <small class="invalid-feedback">투게더 경로를 입력하세요.</small>
+                <br>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('path')}" th:errors="*{path}"></small>
             </div>
             <div class="form-group mt-2">
@@ -29,6 +30,7 @@
                     50자 이내로 해당 투게더의 이름을 등록해주세요.
                 </small>
                 <small class="invalid-feedback">투게더 이름을 입력해주세요.</small>
+                <br>
                 <small class="form-text text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
             </div>
             <div class="form-group mt-2">
@@ -54,7 +56,7 @@
             </div>
             <div class="form-group mt-2">
                 <label for="longIntroduce">상세한 투게더 소개</label>
-                <textarea id="longIntroduce" type="text" th:field="*{longIntroduce}" class="form-control"
+                <textarea id="longIntroduce" style="height: 300px" type="text" th:field="*{longIntroduce}" class="form-control"
                           placeholder="투게더 이름" aria-activedescendant="longIntroduceHelp" required></textarea>
                 <small id="longIntroduceHelp" class="form-text text-muted">
                     해당 투게더의 자세한 운영 계획을 상세히 적어주세요.
@@ -76,5 +78,6 @@
 </div>
 <div th:replace="fragments.html :: footer"></div>
 <div th:replace="fragments.html :: editior-script"></div>
+<div th:replace="fragments.html :: form-validation"></div>
 </body>
 </html>

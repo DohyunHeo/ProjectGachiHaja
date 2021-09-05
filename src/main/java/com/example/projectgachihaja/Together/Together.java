@@ -1,10 +1,12 @@
 package com.example.projectgachihaja.Together;
 import com.example.projectgachihaja.Post.Post;
+import com.example.projectgachihaja.Post.PostType;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.UserAccount;
 import com.example.projectgachihaja.schedule.Schedule;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
+import javassist.expr.NewArray;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,8 +14,11 @@ import javax.validation.constraints.NotBlank;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @NamedEntityGraph(
         name = "Together.withPostAndAccount",
@@ -46,9 +51,6 @@ public class Together {
 
     @OneToMany
     private Set<Post> posts = new HashSet<>();
-
-    @OneToMany
-    private Set<Schedule> schedules = new HashSet<>();
 
     public int candidates_count;
 
@@ -124,5 +126,30 @@ public class Together {
 
     public String pathEncoder(){
         return URLEncoder.encode(path, StandardCharsets.UTF_8);
+    }
+
+    public List<Post> getPosts(String type){
+        List<Post> userPost = new ArrayList<>();
+        switch (type) {
+            case "user":
+                posts.forEach(post -> {
+                    if(post.getPostType() != PostType.NOTICE){
+                        userPost.add(post);
+                    }
+                });
+                break;
+            case  "notice":
+                posts.forEach(post -> {
+                    if(post.getPostType() == PostType.NOTICE){
+                        userPost.add(post);
+                    }
+                });
+                break;
+        }
+        return userPost;
+    }
+
+    public int numberOfPeople(){
+        return this.getManagers().size() + this.getMembers().size();
     }
 }

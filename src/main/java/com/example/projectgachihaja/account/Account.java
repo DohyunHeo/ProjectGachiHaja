@@ -1,11 +1,12 @@
 package com.example.projectgachihaja.account;
 
-import com.example.projectgachihaja.Post.Post;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.*;
 
 import javax.persistence.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Getter @Setter @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Account {
     @Id @GeneratedValue
     Long id;
@@ -55,5 +57,14 @@ public class Account {
 
     public boolean isValidToken(String token) {
         return emailToken.equals(token);
+    }
+
+    public String nicknameEncoder(){
+        return URLEncoder.encode(nickname, StandardCharsets.UTF_8);
+    }
+
+    public Account update(){
+        this.password = UUID.randomUUID().toString();
+        return this;
     }
 }

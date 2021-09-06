@@ -86,13 +86,13 @@ public class AccountService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        Account account = accountRepository.findByEmailAddress(id);
+    public UserDetails loadUserByUsername(String emailAddress) throws UsernameNotFoundException {
+        Account account = accountRepository.findByEmailAddress(emailAddress);
         if(account == null){
-            account = accountRepository.findByNickname(id);
+            account = accountRepository.findByNickname(emailAddress);
         }
         if(account == null){
-            throw new UsernameNotFoundException(id);
+            throw new UsernameNotFoundException(emailAddress);
         }
         if(!account.emailCheck){
             return new UserAccount(account,List.of(new SimpleGrantedAuthority("ROLE_ASSOCIATE")));

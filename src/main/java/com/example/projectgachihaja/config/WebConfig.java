@@ -4,6 +4,7 @@ import com.example.projectgachihaja.notice.NoticeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.StaticResourceLocation;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -23,5 +24,10 @@ public class WebConfig implements WebMvcConfigurer {
                                 .collect(Collectors.toList());
         staticResourcesPath.add("/node_modules/**");
         registry.addInterceptor(noticeInterceptor).excludePathPatterns(staticResourcesPath);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
     }
 }

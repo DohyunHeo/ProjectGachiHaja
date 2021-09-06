@@ -6,11 +6,12 @@ import com.example.projectgachihaja.Together.TogetherRepository;
 import com.example.projectgachihaja.Together.TogetherService;
 import com.example.projectgachihaja.account.Account;
 import com.example.projectgachihaja.account.AccountRepository;
+import com.example.projectgachihaja.account.AccountService;
 import com.example.projectgachihaja.account.CurrentAccount;
+import com.example.projectgachihaja.account.oauth.AccountOAuthForm;
 import com.example.projectgachihaja.notice.Notice;
 import com.example.projectgachihaja.notice.NoticeList;
 import com.example.projectgachihaja.notice.NoticeService;
-import com.example.projectgachihaja.schedule.Schedule;
 import com.example.projectgachihaja.schedule.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,14 +36,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeController {
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final ScheduleRepository scheduleRepository;
     private final TogetherRepository togetherRepository;
     private final TogetherService togetherService;
     private final NoticeService noticeService;
     private final ModelMapper modelMapper;
+    private final HttpSession httpSession;
 
     @GetMapping("/")
     public String home(@CurrentAccount Account account, Model model){
+        AccountOAuthForm accountOAuth= (AccountOAuthForm) httpSession.getAttribute("account");
         if (account != null){
             Account accountFullInfo = accountRepository.findWithTagsAndZonesByNickname(account.getNickname());
             togetherRepository.findFist5WithNewTogetherByAccount(accountFullInfo);
@@ -54,6 +59,17 @@ public class HomeController {
             model.addAttribute("togetherPage", togetherList);
         }
         return "index";
+    }
+
+    @GetMapping("/oauth-success")
+    public String oauth(){
+        AccountOAuthForm account= (AccountOAuthForm) httpSession.getAttribute("account");
+        Account accountOauth = accountRepository.findByNickname(account.getNickname());
+        accountService.logIn(accountOauth);
+        if(accountOauth.getJob().equals("")){
+            return "redirect:/initial-setting";
+        }
+        return "redirect:/";
     }
 
     @GetMapping("/login")

@@ -11,7 +11,11 @@
             <small>초기 설정을 마지막으로 회원가입 절차가 종료됩니다.</small>
             <form class="row" th:action="@{'/initial-setting'}" th:object="${settingsForm}" method="post" novalidate>
                 <div class="col-9">
-                    <input id="nickname" type="text" th:field="*{nickname}" class="form-control" hidden/>
+                    <label for="nickname">닉네임 변경</label>
+                    <input id="nickname" type="text" th:field="*{nickname}" class="form-control" aria-describedby="nicknameHelp" required maxlength="30">
+                    <small id="nicknameHelp" class="form-text text-muted">
+                        닉네임은 언제든지 다시 변경할 수 있습니다.
+                    </small>
                     <div class="form-group mt-1">
                         <label for="introduce">자기 소개</label>
                         <input id="introduce" type="text" th:field="*{introduce}" class="form-control"

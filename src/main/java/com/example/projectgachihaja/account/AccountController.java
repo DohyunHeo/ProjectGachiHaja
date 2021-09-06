@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -155,10 +157,12 @@ public class AccountController {
     }
 
     @GetMapping("/settings/{nickname}")
-    public String accountSettingsView(@CurrentAccount Account account,String nickname, Model model) throws JsonProcessingException {
-        if(!account.getNickname().equals(nickname)){
+    public String accountSettingsView(@CurrentAccount Account account,@PathVariable String nickname, Model model) throws JsonProcessingException {
+        boolean equals = account.getNickname().equals(nickname);
+        if(equals == false){
             return "redirect:/";
         }
+
         model.addAttribute(account);
         model.addAttribute(modelMapper.map(account,SettingsForm.class));
 

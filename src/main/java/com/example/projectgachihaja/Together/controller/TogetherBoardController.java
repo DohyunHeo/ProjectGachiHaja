@@ -77,7 +77,7 @@ public class TogetherBoardController {
         Post newPost = postService.createNewPost(postForm,together, account);
         togetherService.newPostRegister(together,newPost);
 
-        return "redirect:/together/" +together.getPath() + "/board/" +newPost.getId();
+        return "redirect:/together/" +together.pathEncoder() + "/board/" +newPost.getId();
     }
 
     @GetMapping("/together/{path}/board/{postid}")
@@ -114,7 +114,7 @@ public class TogetherBoardController {
         Post post = postRepository.findWithCommentsById(postid);
         postService.postEdit(post, postForm);
 
-        return "redirect:/together/"+together.getPath() +"/board/" + post.getId();
+        return "redirect:/together/"+together.pathEncoder() +"/board/" + post.getId();
     }
 
     @GetMapping("/together/{path}/board/search")
@@ -146,7 +146,7 @@ public class TogetherBoardController {
         postService.postDelete(post,account);
         commentService.allCommentsRemove(comments);
 
-        return "redirect:/together/" +together.getPath() + "/board/";
+        return "redirect:/together/" +together.pathEncoder() + "/board/";
     }
 
     @PostMapping("/together/{path}/board/{postid}/comment")
@@ -156,7 +156,7 @@ public class TogetherBoardController {
         Comment newComment = commentService.newCommentWrite(account, commentForm);
         postService.newCommentRegister(together,post,newComment);
 
-        return "redirect:/together/" +together.getPath() + "/board/" + post.getId();
+        return "redirect:/together/" +together.pathEncoder() + "/board/" + post.getId();
     }
 
     @PostMapping("/together/{path}/board/{postid}/comment/{commentid}/edit")
@@ -166,7 +166,7 @@ public class TogetherBoardController {
         Optional<Comment> comment = commentRepository.findById(commentid);
         commentService.commentEdit(comment.orElseThrow(), commentForm);
 
-        return "redirect:/together/"+together.getPath() +"/board/" + post.getId();
+        return "redirect:/together/"+together.pathEncoder() +"/board/" + post.getId();
     }
 
     @PostMapping("/together/{path}/board/{postid}/comment/{commentid}/remove")
@@ -177,6 +177,6 @@ public class TogetherBoardController {
         postService.commentRemove(post,comment.orElseThrow());
         commentService.commentRemove(account,comment.orElseThrow());
 
-        return "redirect:/together/" +together.getPath() + "/board/" + post.getId();
+        return "redirect:/together/" +together.pathEncoder() + "/board/" + post.getId();
     }
 }

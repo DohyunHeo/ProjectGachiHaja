@@ -71,12 +71,8 @@ public class TogetherService {
         togetherRepository.save(together);
     }
 
-    public Together managerCheck(Account account, String path) {
-        Together together = togetherRepository.findByPath(path);
-        if(!together.getManagers().contains(account)){
-            throw new AccessDeniedException("해당 기능을 사용할 권한이 없습니다.");
-        }
-        return together;
+    public boolean managerCheck(Together together,Account account, String path) {
+        return together.getManagers().contains(account);
     }
 
     public void bannerSetting(Together together, boolean b) {

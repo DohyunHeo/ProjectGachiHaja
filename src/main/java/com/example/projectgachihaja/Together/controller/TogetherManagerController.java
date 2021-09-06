@@ -43,6 +43,9 @@ public class TogetherManagerController {
     @GetMapping("/together/{path}/settings")
     public String togetherSettingsView(@CurrentAccount Account account, @PathVariable String path, Model model) throws JsonProcessingException {
         Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         model.addAttribute(together);
         model.addAttribute(account);
 
@@ -61,37 +64,52 @@ public class TogetherManagerController {
     }
     @PostMapping("/together/{path}/settings/banner")
     public String togetherBanner(@CurrentAccount Account account, @PathVariable String path, String image){
-        Together together = togetherService.managerCheck(account,path);
+        Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.bannerUpdate(together,image);
-        return "redirect:/together/"+together.getPath()+"/settings";
+        return "redirect:/together/"+together.pathEncoder()+"/settings";
     }
 
     @PostMapping("/together/{path}/settings/banner/enable")
     public String enableTogetherBanner(@CurrentAccount Account account, @PathVariable String path){
-        Together together = togetherService.managerCheck(account,path);
+        Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.bannerSetting(together,true);
-        return "redirect:/together/"+together.getPath()+"/settings";
+        return "redirect:/together/"+together.pathEncoder()+"/settings";
     }
 
     @PostMapping("/together/{path}/settings/banner/disable")
     public String disableTogetherBanner(@CurrentAccount Account account, @PathVariable String path){
-        Together together = togetherService.managerCheck(account,path);
+        Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.bannerSetting(together,false);
-        return "redirect:/together/"+together.getPath()+"/settings";
+        return "redirect:/together/"+together.pathEncoder()+"/settings";
     }
 
     @PostMapping("/together/{path}/settings/publish")
     public String togetherPublish(@CurrentAccount Account account, @PathVariable String path){
-        Together together = togetherService.managerCheck(account,path);
+        Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.togetherPublish(together);
-        return "redirect:/together/"+together.getPath()+"/settings";
+        return "redirect:/together/"+together.pathEncoder()+"/settings";
     }
 
     @PostMapping("/together/{path}/settings/close")
     public String togetherClose(@CurrentAccount Account account, @PathVariable String path){
-        Together together = togetherService.managerCheck(account,path);
+        Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.togetherClose(together);
-        return "redirect:/together/"+together.getPath()+"/settings";
+        return "redirect:/together/"+together.pathEncoder()+"/settings";
     }
 
     @PostMapping("/together/{path}/settings/add")
@@ -135,6 +153,9 @@ public class TogetherManagerController {
     @GetMapping("/together/{path}/edit")
     public String togetherEditView(@CurrentAccount Account account,@PathVariable String path, Model model){
         Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         model.addAttribute(together);
         model.addAttribute(modelMapper.map(together,TogetherForm.class));
         model.addAttribute(account);
@@ -145,16 +166,23 @@ public class TogetherManagerController {
     @PostMapping("/together/{path}/edit")
     public String togetherEditComplete(@CurrentAccount Account account,@PathVariable String path,TogetherForm togetherForm,  RedirectAttributes flashmessage){
         Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.togetherInfoUpdate(together,togetherForm);
         flashmessage.addFlashAttribute("message","변경 완료");
 
-        return "redirect:/together/"+together.getPath()+"/edit";
+        return "redirect:/together/"+together.pathEncoder()+"/edit";
     }
 
     @GetMapping("/together/{path}/entryform")
     public String togetherCandidatesList(@CurrentAccount Account account,@PathVariable String path, Model model){
         Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         model.addAttribute(together);
+        model.addAttribute(account);
 
         return "/together/entryform";
     }
@@ -163,10 +191,13 @@ public class TogetherManagerController {
     public String togetherCandidates(@CurrentAccount Account account,@PathVariable String path, String nickname,Boolean request, RedirectAttributes flashmessage){
         Account candidate = accountRepository.findByNickname(nickname);
         Together together = togetherRepository.findByPath(path);
+        if(!togetherService.managerCheck(together,account,path)){
+            return "redirect:/together/"+together.pathEncoder();
+        }
         togetherService.togetherRegistrationApproval(together,candidate,request);
         flashmessage.addFlashAttribute("message","변경 완료");
 
-        return "redirect:/together/"+together.getPath()+"/entryform";
+        return "redirect:/together/"+together.pathEncoder()+"/entryform";
     }
 
 }

@@ -76,8 +76,58 @@ public class AccountController {
             return "redirect:/";
         }
         accountService.emailConfirmComplete(account);
+        return "redirect:/initial-setting";
+    }
 
-        model.addAttribute("nickname", account.getNickname());
+    @GetMapping("/initial-setting")
+    public String accountInitialSetting(@CurrentAccount Account account, Model model) throws JsonProcessingException {
+        model.addAttribute(account);
+        model.addAttribute(modelMapper.map(account,SettingsForm.class));
+
+        List<String> alltagsList = tagRepository.findAll().stream().map(Tag::getTitle).collect(Collectors.toList());
+        model.addAttribute("tagWhiteList", objectMapper.writeValueAsString(alltagsList));
+
+        List<String> allZonesList = zoneRepository.findAll().stream().map(Zone::getCity).collect(Collectors.toList());
+        model.addAttribute("zoneWhiteList", objectMapper.writeValueAsString(allZonesList));
+
+        return "account/initial-setting";
+    }
+
+    @PostMapping("/initial-setting")
+    public String accountInitialSettingComplete(@CurrentAccount Account account, @Valid SettingsForm settingsForm){
+        accountService.updateAccountInfo(account, settingsForm);
+        return "redirect:/";
+    }
+
+    @GetMapping("lost-password")
+    public String lostPasswordView(){
+        return "lost-password";
+    }
+
+    @PostMapping("/lost-password")
+    public String emailLoginSend(String email, Model model, RedirectAttributes flashmessage){
+        Account account = accountRepository.findByEmailAddress(email);
+        if(account == null){
+            model.addAttribute("error");
+            return "lost-password";
+        }
+        flashmessage.addFlashAttribute("message","발송 완료");
+        accountService.sendEmailLoginLink(account);
+        return "redirect:/lost-password";
+    }
+    @GetMapping("/email-login")
+    public String emailLogin(String token, String email, Model model){
+        Account account = accountRepository.findByEmailAddress(email);
+
+        if(account == null){
+            model.addAttribute("error","invalid.email");
+            return "redirect:/";
+        }
+        if(!account.isValidToken(token)){
+            model.addAttribute("error","invalid.token");
+            return "redirect:/";
+        }
+        accountService.logIn(account);
         return "redirect:/";
     }
 
@@ -105,7 +155,10 @@ public class AccountController {
     }
 
     @GetMapping("/settings/{nickname}")
-    public String accountSettingsView(@CurrentAccount Account account, @Valid SettingsForm settingsForm, Model model, RedirectAttributes flashmessage) throws JsonProcessingException {
+    public String accountSettingsView(@CurrentAccount Account account,String nickname, Model model) throws JsonProcessingException {
+        if(!account.getNickname().equals(nickname)){
+            return "redirect:/";
+        }
         model.addAttribute(account);
         model.addAttribute(modelMapper.map(account,SettingsForm.class));
 
@@ -123,7 +176,7 @@ public class AccountController {
         return "account/settings";
     }
     @PostMapping("/settings/{nickname}")
-    public String accountSettingsUpdate(@CurrentAccount Account account, @Valid SettingsForm settingsForm, Model model, RedirectAttributes flashmessage){
+    public String accountSettingsUpdate(@CurrentAccount Account account, @Valid SettingsForm settingsForm, RedirectAttributes flashmessage){
         accountService.updateAccountInfo(account, settingsForm);
         flashmessage.addFlashAttribute("message","변경 완료");
 

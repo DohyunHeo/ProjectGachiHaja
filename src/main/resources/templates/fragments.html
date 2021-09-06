@@ -149,7 +149,7 @@
                     <a type="button" class="btn btn-outline-light me-2" th:href="@{/login}">로그인</a>
                     <a type="button" class="btn btn-light" th:href="@{/create-account}">회원가입</a>
                 </div>
-                <div sec:authorize="isAuthenticated()">
+                <div sec:authorize="isAuthenticated()" th:if="${account.emailCheck}">
                     <a id="accountmenu" class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
                         <span class="navbar-toggler-icon" th:if="${!newNotice}">
                             <svg th:if="${#strings.isEmpty(account?.profileImage)}" th:data-jdenticon-value="${#authentication.name}" width="32" height="32" class="rounded border bg-light"></svg>
@@ -455,28 +455,25 @@
             </div>
             <div class="col-4 text-end mt-2">
                 <span class="d-inline-block">
-                    <button class="btn btn-primary btn-sm" style="pointer-events: none;" type="button" th:text="*{together.togetherType.getKrName}" disabled></button>
+                    <button class="btn btn-outline-secondary" style="pointer-events: none;" type="button" th:text="*{together.togetherType.getKrName}" disabled></button>
                 </span>
                         <span th:if="${!together.published}" class="d-inline-block">
-                            <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled></button>
+                            <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>미공개</button>
                 </span>
                         <span th:if="${together.closed}" class="d-inline-block">
                             <button class="btn btn-warning btn-sm" style="pointer-events: none;" type="button" disabled>종료됨</button>
                 </span>
-                        <span sec:authorize="isAuthenticated()" th:if="${together.isJoinable(#authentication.principal)}"
-                              class="btn-group" role="group" aria-label="Basic example">
-                            <a class="btn btn-primary" th:href="@{'/together/' + ${together.path} + '/join'}">
+                        <span sec:authorize="isAuthenticated()" th:if="${together.isJoinable(#authentication.principal)}" class="btn-group" role="group">
+                            <a class="btn btn-outline-secondary" th:href="@{'/together/' + ${together.path} + '/join'}">
                                 투게더 가입신청
                             </a>
                 </span>
-                        <span sec:authorize="isAuthenticated()" th:if="${together.isCondidate(#authentication.principal)}"
-                              class="btn-group" role="group" aria-label="Basic example">
-                            <a class="btn btn-primary">
+                        <span sec:authorize="isAuthenticated()" th:if="${together.isCondidate(#authentication.principal)}" class="btn-group" role="group">
+                            <a class="btn btn-outline-secondary">
                                 가입신청 완료
                             </a>
                 </span>
-                        <span sec:authorize="isAuthenticated()"
-                              th:if="${!together.closed && together.isMember(#authentication.principal)}" class="btn-group" role="group">
+                        <span sec:authorize="isAuthenticated()" th:if="${!together.closed && together.isMember(#authentication.principal)}" class="btn-group" role="group">
                             <a class="btn btn-outline-warning" th:href="@{'/together/' + ${together.path} + '/leave'}">
                                 투게더 탈퇴
                             </a>

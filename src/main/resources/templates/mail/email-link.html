@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>모임 웹 서비스 가치하자</title>
+</head>
+<body>
+<div>
+    <p>가치하자 테스트 운영에 참여주셔서 감사합니다. <span th:text="${nickname}"></span>님</p>
+    <h2 th:text="${message}"></h2>
+    <div>
+        아래 링크를 클릭하여 절차를 계속 진행해 주시기 바랍니다.
+        <a th:href="${host + link}" th:text="${linkName}"></a>
+        <p>링크가 동작하지 않는 경우에는 아래 URL을 직접 붙여넣어주세요.</p>
+        <small th:text="${host + link}"></small>
+    </div>
+</div>
+</body>
+</html>

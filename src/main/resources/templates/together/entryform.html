@@ -19,13 +19,13 @@
                 </div>
                 <span th:text="${candidate.introduce}"></span>
             </div>
-            <form method="post" th:action="@{'/together/' + ${together.getPath()} + '/entryform?nickname=' + ${candidate.getNickname()}+'&request=true'}">
+            <form method="post" th:action="@{'/together/' + ${together.pathEncoder()} + '/entryform?nickname=' + ${candidate.getNickname()}+'&request=true'}">
                 <div class="form-group">
                     <button class="btn btn-primary btn-block" type="submit"
                             aria-describedby="submitHelp">멤버 승인</button>
                 </div>
             </form>
-            <form method="post" th:action="@{'/together/' + ${together.getPath()} + '/entryform?nickname=' + ${candidate.getNickname()} +'&request=false'}">
+            <form method="post" th:action="@{'/together/' + ${together.pathEncoder()} + '/entryform?nickname=' + ${candidate.getNickname()} +'&request=false'}">
                 <div class="form-group">
                     <button class="btn btn-warning btn-block" type="submit"
                             aria-describedby="submitHelp">멤버 거절</button>

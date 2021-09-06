@@ -8,7 +8,7 @@
 <div class="container">
     <div th:replace="fragments.html :: together-info"></div>
     <div th:replace="fragments.html :: together-menu (edit)"></div>
-    <form class="needs-validation" th:action="@{'/together/' + ${together.getPath()} + '/edit'}" th:object="${togetherForm}" method="post" novalidate>
+    <form class="needs-validation" th:action="@{'/together/' + ${together.pathEncoder()} + '/edit'}" th:object="${togetherForm}" method="post" novalidate>
         <div class="form-group mt-4">
             <label for="path"><h2>투게더 경로</h2></label>
             <input id="path" type="text" name="newPath" th:field="*{path}" class="form-control"

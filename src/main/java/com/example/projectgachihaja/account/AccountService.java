@@ -1,5 +1,8 @@
 package com.example.projectgachihaja.account;
 
+import com.example.projectgachihaja.config.AppProperties;
+import com.example.projectgachihaja.mail.EmailMessage;
+import com.example.projectgachihaja.mail.EmailService;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,8 +31,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
     private final ModelMapper modelMapper;
-    public final PasswordEncoder passwordEncoder;
-    public final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AccountRepository accountRepository;
+    private final TemplateEngine templateEngine;
+    private final AppProperties appProperties;
+    private final EmailService emailService;
+
 
     public Account createNewAccount(CreateAccountForm createAccountInfo) {
         Account account = saveAccount(createAccountInfo);
@@ -37,7 +46,21 @@ public class AccountService implements UserDetailsService {
 
     private void emailConfirm(Account account) {
         account.generateEmailToken();
-        log.info("/check-email-token?token="+account.getEmailToken()+"&email="+account.getEmailAddress());
+
+        Context context = new Context();
+        context.setVariable("link", "/check-email-token?token="+account.getEmailToken()+"&email="+account.getEmailAddress() );
+        context.setVariable("nickname", account.getNickname());
+        context.setVariable("linkName","이메일 인증을 통한 회원 가입 링크");
+        context.setVariable("message","가치하자는 회원가입의 마지막 절차로 이메일 인증을 사용하고 있습니다.");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("mail/email-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(account.getEmailAddress())
+                .subject("가치하자 회원가입 인증 메일")
+                .message(message)
+                .build();
+        emailService.sendEmail(emailMessage);
     }
 
     private Account saveAccount(CreateAccountForm createAccountInfo) {
@@ -120,5 +143,24 @@ public class AccountService implements UserDetailsService {
     public void tagRemove(Account account, Tag tag) {
         Optional<Account> byId = accountRepository.findById(account.getId());
         byId.ifPresent(a->a.getTags().remove(tag));
+    }
+
+    public void sendEmailLoginLink(Account account) {
+        account.generateEmailToken();
+
+        Context context = new Context();
+        context.setVariable("link", "/email-login?token="+account.getEmailToken()+"&email="+account.getEmailAddress() );
+        context.setVariable("nickname", account.getNickname());
+        context.setVariable("linkName","1회용 로그인 링크");
+        context.setVariable("message","가치하자는 비밀 번호 분실 시 가입할때 기입한 이메일을 통해 1회용 로그인을 하실 수 있습니다.");
+        context.setVariable("host", appProperties.getHost());
+        String message = templateEngine.process("mail/email-link", context);
+
+        EmailMessage emailMessage = EmailMessage.builder()
+                .to(account.getEmailAddress())
+                .subject("가치하자 이메일을 통한 1회용 로그인")
+                .message(message)
+                .build();
+        emailService.sendEmail(emailMessage);
     }
 }

@@ -44,7 +44,7 @@ public class HomeController {
     public String home(@CurrentAccount Account account, Model model){
         if (account != null){
             Account accountFullInfo = accountRepository.findWithTagsAndZonesByNickname(account.getNickname());
-            List<Schedule> scheduleList = scheduleRepository.findAllByMembersAndStartAfterOrderByStartDesc(account, LocalDateTime.now());
+            togetherRepository.findFist5WithNewTogetherByAccount(accountFullInfo);
             model.addAttribute(accountFullInfo);
             model.addAttribute("togetherList",togetherRepository.findFist5WithNewTogetherByAccount(accountFullInfo));
             model.addAttribute("scheduleList", scheduleRepository.findAllByMembersAndStartAfterOrderByStartDesc(account, LocalDateTime.now()));

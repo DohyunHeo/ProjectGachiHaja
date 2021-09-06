@@ -56,7 +56,7 @@ public class TogetherController {
             return "together/create";
         }
         Together together = togetherService.createNewTogether(modelMapper.map(togetherForm, Together.class), account);
-        return "redirect:/together/" + together.getPath();
+        return "redirect:/together/" + together.pathEncoder()+"/settings";
     }
 
     @GetMapping("/together/{path}")
@@ -82,13 +82,13 @@ public class TogetherController {
     public String togetherJoinRequest(@CurrentAccount Account account, @PathVariable String path){
         Together together = togetherRepository.findTogetherWithCandidatesByPath(path);
         togetherService.addTogetherCandidates(account, together);
-        return "redirect:/together/"+together.getPath();
+        return "redirect:/together/"+together.pathEncoder();
     }
 
     @GetMapping("/together/{path}/leave")
     public String togetherLeave(@CurrentAccount Account account, @PathVariable String path){
         Together together = togetherRepository.findByPath(path);
         togetherService.togetherLeave(account, together);
-        return "redirect:/together/"+together.getPath();
+        return "redirect:/together/"+together.pathEncoder();
     }
 }

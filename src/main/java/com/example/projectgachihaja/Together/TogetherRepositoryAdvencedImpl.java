@@ -41,7 +41,9 @@ public class TogetherRepositoryAdvencedImpl extends QuerydslRepositorySupport im
         QTogether together = QTogether.together;
         JPQLQuery<Together> query = from(together).where(together.published.isTrue()
                 .and(together.tags.any().in(account.getTags()))
-                .and(together.zones.any().in(account.getZones())))
+                .and(together.zones.any().in(account.getZones()))
+                .and(together.managers.any().eq(account).not())
+                .and(together.members.any().eq(account).not()))
                 .leftJoin(together.tags, QTag.tag).fetchJoin()
                 .leftJoin(together.zones, QZone.zone).fetchJoin()
                 .orderBy(together.publishedDateTime.desc())

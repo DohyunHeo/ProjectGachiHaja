@@ -18,9 +18,9 @@
     </div>
 </div>
 <div class="container" sec:authorize="isAuthenticated()">
-    <div class="position-relative overflow-hidden text-center">
+    <div class="position-relative p-md-5 m-md-3 overflow-hidden text-center">
         <div class="col-md-12 mx-auto my-3">
-            <h1 class="display-3 fw-normal" th:text="'또 뵙네요, '+${account.nickname} + '님'"></h1>
+            <h1 class="display-3 fw-normal" th:text="'어서오세요, '+${account.nickname} + '님'"></h1>
             <p class="lead fw-normal">새로운 정보들을 확인해 볼까요?</p>
         </div>
     </div>
@@ -67,11 +67,11 @@
         </div>
     </div>
 </div>
-<div class="row justify-content-center py-3" sec:authorize="isAuthenticated()">
+<div class="row justify-content-center py-3" sec:authorize="isAuthenticated()" th:if="${account.emailCheck}">
     <div class="row justify-content-center">
-        <span class="text-center h3 tracking">일정 일람</span>
-        <div th:if="${scheduleList.size() == 0}" class="text-center h4 tracking">현재 참가하신 일정이 없습니다.</div>
         <div class="col-6">
+            <span class="h3 tracking">일정 일람</span>
+            <div th:if="${scheduleList.size() == 0}" class="text-center h4 tracking py-6">현재 참가하신 일정이 없습니다.</div>
             <div class="row">
                 <div class="col-md-6 tracking" th:each="schedule: ${scheduleList}">
                     <div class="card mb-3 shadow-sm">
@@ -104,6 +104,7 @@
     </div>
     <div class="col-6 py-5">
         <span class="h3 tracking">추천 투게더</span>
+        <div th:if="${togetherList.size() == 0}" class="text-center h4 tracking py-6">추천 투게더가 없습니다.</div>
         <div id="carouselCaptions" class="carousel slide tracking" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 <button type="button" data-bs-target="#carouselCaptions" th:each="together : ${togetherList}" th:data-bs-slide-to="${togetherStat.index}" class="active" aria-current="true"></button>

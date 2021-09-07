@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -71,5 +72,15 @@ public class PostService {
         post.setTitle(postForm.getTitle());
         post.setPostType(postForm.getPostType());
         postRepository.save(post);
+    }
+
+    public void postRemoveAll(Account account) {
+        List<Post> posts = postRepository.findAllByWriter(account);
+        if(posts != null) {
+            posts.forEach(post -> {
+                post.getComments().clear();
+            });
+            postRepository.deleteAll(posts);
+        }
     }
 }

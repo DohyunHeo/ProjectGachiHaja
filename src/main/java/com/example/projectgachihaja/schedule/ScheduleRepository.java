@@ -18,4 +18,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByMembersAndStartAfterOrderByStartDesc(Account account, LocalDateTime now);
 
     List<Schedule> findAllByTogether(Together together);
+
+    List<Schedule> findAllByManager(Account account);
+
+    List<Schedule> findAllByMembers(Account account);
+
+    List<Schedule> findAllByCandidates(Account account);
 }

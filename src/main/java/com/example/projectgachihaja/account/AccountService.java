@@ -3,6 +3,7 @@ package com.example.projectgachihaja.account;
 import com.example.projectgachihaja.config.AppProperties;
 import com.example.projectgachihaja.mail.EmailMessage;
 import com.example.projectgachihaja.mail.EmailService;
+
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.zone.Zone;
 import lombok.RequiredArgsConstructor;
@@ -162,5 +163,10 @@ public class AccountService implements UserDetailsService {
                 .message(message)
                 .build();
         emailService.sendEmail(emailMessage);
+    }
+
+    public void removeAccount(Account account) {
+        SecurityContextHolder.clearContext();
+        accountRepository.delete(account);
     }
 }

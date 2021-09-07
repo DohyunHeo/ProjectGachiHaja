@@ -133,4 +133,31 @@ public class TogetherService {
     public void bannerUpdate(Together together, String image) {
         together.setBanner(image);
     }
+
+    public void togetherRemoveAll(Account account) {
+        List<Together> managers = togetherRepository.findAllByManagers(account);
+        if(managers != null) {
+            managers.forEach(manager -> {
+                manager.getManagers().clear();
+                manager.getMembers().clear();
+                manager.getPosts().clear();
+                manager.getCandidates().clear();
+                manager.getTags().clear();
+                manager.getZones().clear();
+            });
+            togetherRepository.deleteAll(managers);
+        }
+        List<Together> members = togetherRepository.findAllByMembers(account);
+        if(members != null){
+            members.forEach(member ->{
+                member.getMembers().remove(account);
+            });
+        }
+        List<Together> candidates = togetherRepository.findAllByCandidates(account);
+        if(candidates != null){
+            candidates.forEach(candidate ->{
+                candidate.getMembers().remove(account);
+            });
+        }
+    }
 }

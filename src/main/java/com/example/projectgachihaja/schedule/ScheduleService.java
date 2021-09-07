@@ -10,6 +10,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -50,6 +52,35 @@ public class ScheduleService {
 
     public void removeSchedule(Schedule schedule) {
         eventPublisher.publishEvent(new ScheduleUpdateEvent(schedule.getTogether(),schedule,"일정이 취소되었습니다."));
+        schedule.getMembers().clear();
+        schedule.getCandidates().clear();
         scheduleRepository.delete(schedule);
+    }
+
+    public void scheduleRemoveAll(Account account) {
+        List<Schedule> schedules = scheduleRepository.findAllByManager(account);
+        if(schedules != null) {
+            schedules.forEach(schedule -> {
+                schedule.getMembers().clear();
+                schedule.getCandidates().clear();
+            });
+            scheduleRepository.deleteAll(schedules);
+        }
+
+        List<Schedule> members = scheduleRepository.findAllByMembers(account);
+        if(members != null) {
+            members.forEach(member -> {
+                member.getMembers().remove(account);
+            });
+            scheduleRepository.deleteAll(members);
+        }
+
+        List<Schedule> candidates = scheduleRepository.findAllByCandidates(account);
+        if(candidates != null) {
+            candidates.forEach(candidate -> {
+                candidate.getCandidates().remove(account);
+            });
+            scheduleRepository.deleteAll(candidates);
+        }
     }
 }

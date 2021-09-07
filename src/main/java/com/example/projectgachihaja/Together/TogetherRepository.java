@@ -39,4 +39,10 @@ public interface TogetherRepository extends JpaRepository<Together, Long>, Toget
     boolean existsByTitle(String title);
 
     boolean existsByPath(String path);
+
+    List<Together> findAllByManagers(Account account);
+
+    List<Together> findAllByMembers(Account account);
+
+    List<Together> findAllByCandidates(Account account);
 }

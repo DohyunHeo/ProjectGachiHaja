@@ -28,4 +28,11 @@ public class NoticeService {
         List<Notice> allByAccountAndChecked = noticeRepository.findAllByAccountAndChecked(account, false);
         allByAccountAndChecked.forEach(e -> e.setChecked(true));
     }
+
+    public void noticeRemoveAll(Account account) {
+        List<Notice> notices = noticeRepository.findAllByAccount(account);
+        if(notices != null) {
+            noticeRepository.deleteAll(notices);
+        }
+    }
 }

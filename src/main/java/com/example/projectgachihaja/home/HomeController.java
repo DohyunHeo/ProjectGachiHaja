@@ -46,7 +46,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(@CurrentAccount Account account, Model model){
-        AccountOAuthForm accountOAuth= (AccountOAuthForm) httpSession.getAttribute("account");
         if (account != null){
             Account accountFullInfo = accountRepository.findWithTagsAndZonesByNickname(account.getNickname());
             togetherRepository.findFist5WithNewTogetherByAccount(accountFullInfo);
@@ -66,7 +65,7 @@ public class HomeController {
         AccountOAuthForm account= (AccountOAuthForm) httpSession.getAttribute("account");
         Account accountOauth = accountRepository.findByNickname(account.getNickname());
         accountService.logIn(accountOauth);
-        if(accountOauth.getJob().equals("")){
+        if(accountOauth.getJob() == null){
             return "redirect:/initial-setting";
         }
         return "redirect:/";

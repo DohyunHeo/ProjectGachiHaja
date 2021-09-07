@@ -109,8 +109,15 @@
           <div id="cropped-new-profile-image" class="mt-3"></div>
         </div>
       </div>
+      <div>
+        <form class="row" th:action="@{'/settings/'+ ${account.getNickname()}+'/account-remove'}" method="post" novalidate>
+          <div class="form-group mt-1">
+            <button class="btn btn-danger btn-block" type="submit" aria-describedby="summitHelp">계정삭제</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+    </div>
 </div>
 <div th:replace="fragments.html :: footer"></div>
 <link href="/node_modules/cropper/dist/cropper.min.css" rel="stylesheet">

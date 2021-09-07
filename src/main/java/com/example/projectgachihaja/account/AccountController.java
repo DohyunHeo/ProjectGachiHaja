@@ -1,9 +1,15 @@
 package com.example.projectgachihaja.account;
 
 
+import com.example.projectgachihaja.Post.PostService;
+import com.example.projectgachihaja.Together.TogetherRepository;
+import com.example.projectgachihaja.Together.TogetherService;
+import com.example.projectgachihaja.comment.CommentService;
 import com.example.projectgachihaja.notice.Notice;
 import com.example.projectgachihaja.notice.NoticeList;
 import com.example.projectgachihaja.notice.NoticeRepository;
+import com.example.projectgachihaja.notice.NoticeService;
+import com.example.projectgachihaja.schedule.ScheduleService;
 import com.example.projectgachihaja.tag.Tag;
 import com.example.projectgachihaja.tag.TagRepository;
 import com.example.projectgachihaja.tag.TagService;
@@ -15,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -22,6 +29,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -43,6 +51,13 @@ public class AccountController {
     private final TagService tagService;
     private final ZoneService zoneService;
     private final NoticeRepository noticeRepository;
+
+    private final TogetherService togetherService;
+    private final PostService postService;
+    private final CommentService commentService;
+    private final ScheduleService scheduleService;
+    private final NoticeService noticeService;
+    private final HttpSession httpSession;
 
     @InitBinder("createAccountForm")
     public void initBinder(WebDataBinder webDataBinder){
@@ -223,5 +238,20 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/settings/{nickname}/account-remove")
+    public String removeAccount(@CurrentAccount Account account){
+        togetherService.togetherRemoveAll(account);
+        postService.postRemoveAll(account);
+        scheduleService.scheduleRemoveAll(account);
+        noticeService.noticeRemoveAll(account);
+        commentService.commentRemoveAll(account);
+        accountService.removeAccount(account);
+        Object object = httpSession.getAttribute("login");
+        if(object != null){
+            httpSession.removeAttribute("login");
+            httpSession.invalidate();
+        }
+        return "redirect:/";
+    }
 
 }

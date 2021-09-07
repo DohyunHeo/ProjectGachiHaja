@@ -27,7 +27,8 @@ import java.util.stream.Collectors;
                 @NamedAttributeNode("tags"),
                 @NamedAttributeNode("zones"),
                 @NamedAttributeNode("managers"),
-                @NamedAttributeNode("members")
+                @NamedAttributeNode("members"),
+                @NamedAttributeNode("candidates")
         },
         subgraphs = {
                 @NamedSubgraph(name = "writer", attributeNodes = @NamedAttributeNode("writer")),

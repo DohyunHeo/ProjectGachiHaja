@@ -83,7 +83,9 @@ public class HomeController {
         model.addAttribute("togetherPage", togetherPage);
         model.addAttribute("keyword",keyword);
         model.addAttribute("sortProperty", "publishedDateTime");
-        model.addAttribute(account);
+        if(account != null) {
+            model.addAttribute(account);
+        }
         return "search";
     }
 

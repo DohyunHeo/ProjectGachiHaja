@@ -65,7 +65,10 @@
                             이전
                         </a>
                     </li>
-                    <li class="page-item" th:if="${togetherPage.getSize() != 0}" th:classappend="${i == togetherPage.getNumber()}? active" th:each="i: ${#numbers.sequence(0, togetherPage.getTotalPages() -1)}">
+                    <li class="page-item" th:if="${togetherPage.getTotalElements() == 0}" th:classappend="${true}? active">
+                        <a class="page-link" th:text="${1}"></a>
+                    </li>
+                    <li class="page-item" th:if="${togetherPage.getTotalElements() != 0}" th:classappend="${i == togetherPage.getNumber()}? active" th:each="i: ${#numbers.sequence(0, togetherPage.getTotalPages() -1)}">
                         <a th:href="@{'/search/together?keyword=' + ${keyword} + '&sort=' + ${sortProperty} + ',desc&page='+ ${i}}" class="page-link" th:text="${i+1}"></a>
                     </li>
                     <li class="page-item" th:classappend="${!togetherPage.hasNext()}? disabled">

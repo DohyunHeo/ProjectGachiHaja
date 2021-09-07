@@ -21,9 +21,10 @@
 * Together 내부 게시판
 * Together 모임 일정 표시
 * 에러 페이지
-
-# 남은 작업
-* 각종 알림
+* * 각종 알림
 * index 페이지
 * 처리 가능한 모든 곳에 validator 적용
-* REST API + OAuth 2.0 적용
+* OAuth 2.0 적용
+
+# 남은 작업
+* REST API

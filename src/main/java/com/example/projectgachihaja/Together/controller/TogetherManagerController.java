@@ -60,7 +60,7 @@ public class TogetherManagerController {
         Set<Zone> zones = togetherService.getZones(together);
         model.addAttribute("zones",zones.stream().map(Zone::getCity).collect(Collectors.toList()));
 
-        return "/together/settings";
+        return "together/settings";
     }
     @PostMapping("/together/{path}/settings/banner")
     public String togetherBanner(@CurrentAccount Account account, @PathVariable String path, String image){
@@ -160,7 +160,7 @@ public class TogetherManagerController {
         model.addAttribute(modelMapper.map(together,TogetherForm.class));
         model.addAttribute(account);
 
-        return "/together/edit";
+        return "together/edit";
     }
 
     @PostMapping("/together/{path}/edit")
@@ -184,7 +184,7 @@ public class TogetherManagerController {
         model.addAttribute(together);
         model.addAttribute(account);
 
-        return "/together/entryform";
+        return "together/entryform";
     }
 
     @PostMapping("/together/{path}/entryform")

@@ -31,8 +31,8 @@
         <div class="row p-4">
             <div class="col-md-3 tracking" th:each="together: ${togetherPage}" th:classappend="i == ${togetherPage.size()}">
                 <div class="card mb-3 shadow-sm">
-                    <img src="images/DefualtTogetherBanner.png" th:if="${!together.useBanner}" class="context card-img-top" th:alt="${together.banner}">
-                    <img th:src="${together.banner}" th:if="${together.useBanner}" class="context card-img-top" th:alt="${together.banner}">
+                    <img src="images/DefualtTogetherBanner.png" th:if="${together.banner == null}" class="context card-img-top" th:alt="${together.banner}">
+                    <img th:src="${together.banner}" th:if="${together.banner != null}" class="context card-img-top" th:alt="${together.banner}">
                      <div class="card-body">
                          <div class="d-flex justify-content-between align-items-center">
                             <a th:href="@{'/together/' + ${together.path}}" class="text-decoration-none">

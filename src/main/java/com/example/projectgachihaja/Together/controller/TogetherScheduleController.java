@@ -68,7 +68,7 @@ public class TogetherScheduleController {
         model.addAttribute(account);
         model.addAttribute(together);
         model.addAttribute(scheduleForm);
-        return "/together/schedule/create";
+        return "together/schedule/create";
     }
 
     @PostMapping("/together/{path}/schedule/create")
@@ -77,7 +77,7 @@ public class TogetherScheduleController {
         if(errors.hasErrors()){
             model.addAttribute(together);
             model.addAttribute(account);
-            return "/together/schedule/create";
+            return "together/schedule/create";
         }
         Schedule newSchedule = scheduleService.createNewSchedule(scheduleForm,together, account);
 
@@ -91,7 +91,7 @@ public class TogetherScheduleController {
         model.addAttribute(schedule);
         model.addAttribute(together);
         model.addAttribute(account);
-        return "/together/schedule/info";
+        return "together/schedule/info";
     }
 
     @PostMapping("/together/{path}/schedule/{id}/join")
@@ -124,7 +124,7 @@ public class TogetherScheduleController {
         model.addAttribute(scheduleForm);
         model.addAttribute(together);
         model.addAttribute(account);
-        return "/together/schedule/edit";
+        return "together/schedule/edit";
     }
 
     @PostMapping("/together/{path}/schedule/{id}/edit")
@@ -136,7 +136,7 @@ public class TogetherScheduleController {
             model.addAttribute(together);
             model.addAttribute(schedule);
             model.addAttribute(account);
-            return "/together/schedule/edit";
+            return "together/schedule/edit";
         }
         scheduleService.editSchedule(schedule, scheduleForm);
         return "redirect:/together/"+path+"/schedule/"+id;

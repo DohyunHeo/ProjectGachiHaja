@@ -16,12 +16,12 @@
 
 # 기능
 * 계정, 로그인, 로그아웃 (OAuth 2.0 포함)
-** 프로필 및 계정 설정
-** 사용자 알림
-* 모임을 위한 Togther
-** Together 검색
-** Together 회원 가입, 회원 가입 승인
-** Together 내부 게시판
-** Together 모임 일정 표시
+- 프로필 및 계정 설정
+- 사용자 알림
+* 모임을 위한 하나의 단위 Togther
+- Together 검색
+- Together 회원 가입, 회원 가입 승인
+- Together 내부 게시판
+- Together 모임 일정 표시
 * 에러 페이지 적용
 * 처리 가능한 모든 클래스에 예외사항 적용

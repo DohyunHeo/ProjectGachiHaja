@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="fragments.html :: head">
+</head>
+<body>
+<header th:replace="fragments.html :: header"></header>
+<div class="container">
+    <div th:replace="fragments.html :: together-info"></div>
+    <div th:replace="fragments.html :: together-menu (info)"></div>
+    <div class="d-flex flex-row px-3 text-center">
+        <div class="alert alert-info" role="alert">해당 투게더에 가입하지 않아 열람하실수 없습니다. 해당 투게더에 가입하시려면 오른쪽 상단에 투게더 가입신청을 클릭하세요.</div>
+    </div>
+</div>
+<div th:replace="fragments.html :: footer"></div>
+</body>
+</html>

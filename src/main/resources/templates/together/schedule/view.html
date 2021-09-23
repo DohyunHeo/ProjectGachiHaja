@@ -8,6 +8,7 @@
 <div class="container">
     <div th:replace="fragments.html :: together-info"></div>
     <div th:replace="fragments.html :: together-menu (schedule)"></div>
+    <div th:if="${permission_error}" class="alert alert-danger text-center col-sm-6" role="alert" th:text="${permission_error}"></div>
     <div id='calendar' style="background-color: white"></div>
 </div>
 <div th:replace="fragments.html :: footer"></div>

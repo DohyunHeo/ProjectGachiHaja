@@ -88,6 +88,9 @@ public class TogetherScheduleController {
     public String togetherScheduleInfo(@CurrentAccount Account account, @PathVariable String path, @PathVariable Long id, Model model) {
         Together together = togetherRepository.findWithDefaultInfoByPath(path);
         Schedule schedule = scheduleRepository.findWithMembersById(id);
+        if(!togetherService.permissionCheck(together,account)){
+            return "redirect:/together/" +together.pathEncoder() + "/error";
+        }
         model.addAttribute(schedule);
         model.addAttribute(together);
         model.addAttribute(account);

@@ -69,6 +69,16 @@ public class TogetherController {
         return "together/view";
     }
 
+    @GetMapping("/together/{path}/error")
+    public String togetherErrorView(@CurrentAccount Account account,@PathVariable String path, Model model){
+        Together together = togetherRepository.findByPath(path);
+        model.addAttribute(together);
+        if(account != null)
+            model.addAttribute(account);
+
+        return "together/error";
+    }
+
     @GetMapping("/together/{path}/members")
     public String togetherMembersView(@CurrentAccount Account account,@PathVariable String path, Model model){
         Together together = togetherRepository.findByPath(path);

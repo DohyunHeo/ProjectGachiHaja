@@ -63,6 +63,9 @@ public class TogetherBoardController {
     @GetMapping("/together/{path}/board/create")
     public String togetherPostCreate(@CurrentAccount Account account, @PathVariable String path, Model model){
         Together together = togetherRepository.findWithPostsByPath(path);
+        if(!togetherService.permissionCheck(together,account)){
+            return "redirect:/together/" +together.pathEncoder() + "/error";
+        }
         PostForm postForm = new PostForm();
         model.addAttribute(together);
         model.addAttribute(account);
@@ -83,6 +86,9 @@ public class TogetherBoardController {
     @GetMapping("/together/{path}/board/{postid}")
     public String postView(@CurrentAccount Account account, @PathVariable String path,@PathVariable Long postid, Model model){
         Together together = togetherRepository.findWithPostsByPath(path);
+        if(!togetherService.permissionCheck(together,account)){
+            return "redirect:/together/" +together.pathEncoder() + "/error";
+        }
         Post post = postRepository.findWithCommentsById(postid);
         CommentForm commentForm = new CommentForm();
 
@@ -99,6 +105,9 @@ public class TogetherBoardController {
     public String togetherPostEdit(@CurrentAccount Account account, @PathVariable String path,@PathVariable Long postid ,Model model){
         Together together = togetherRepository.findWithPostsByPath(path);
         Post post = postRepository.findWithCommentsById(postid);
+        if(!post.getWriter().getNickname().equals(account.getNickname())){
+            return "redirect:/together/" +together.pathEncoder() + "/board";
+        }
         PostForm postForm = modelMapper.map(post,PostForm.class);
         model.addAttribute(post);
         model.addAttribute(together);

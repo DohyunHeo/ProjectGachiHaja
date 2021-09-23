@@ -75,6 +75,17 @@ public class TogetherService {
         return together.getManagers().contains(account);
     }
 
+    public boolean permissionCheck(Together together,Account account){
+        boolean isMemberOrManager = false;
+        if(together.getMembers().contains(account)){
+            isMemberOrManager = true;
+        }
+        else if(together.getManagers().contains(account)){
+            isMemberOrManager = true;
+        }
+        return isMemberOrManager;
+    }
+
     public void bannerSetting(Together together, boolean b) {
         together.setUseBanner(b);
     }

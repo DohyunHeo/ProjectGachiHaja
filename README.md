@@ -1,5 +1,6 @@
 # ProjectGachiHaja
 스터디, 동호회등 각종 모임을 위한 사이트 "가치하자"
+http://gachihaja.xyz/
 
 # 개발 환경
 * 스프링 스프링 부트

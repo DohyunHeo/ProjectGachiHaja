@@ -21,6 +21,9 @@ public class CustomErrorController implements ErrorController {
         model.addAttribute(account);
         if(status != null){
             int statusCode = Integer.valueOf(status.toString());
+            if(statusCode == HttpStatus.BAD_REQUEST.value()){
+                return VIEW_PATH + "400";
+            }
             if(statusCode == HttpStatus.NOT_FOUND.value()){
                 return VIEW_PATH + "404";
             }
